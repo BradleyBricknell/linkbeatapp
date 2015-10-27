@@ -8,7 +8,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.io.InputStream;
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
@@ -18,12 +20,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.acrcloud.rec.sdk.ACRCloudClient;
 import com.acrcloud.rec.sdk.ACRCloudConfig;
 import com.acrcloud.rec.sdk.IACRCloudListener;
-import org.w3c.dom.Text;
+import android.graphics.Bitmap;
 
 public class HomeTest extends Activity{
 
@@ -164,9 +167,6 @@ public class HomeTest extends Activity{
     public void onVolumeChanged(double volume) {
       //  mVolume.setText(getResources().getString(R.string.app_name) + volume);
     }
-
-
-
     public void getBandsInTown(){
         new Thread(){
             public void run(){
@@ -203,13 +203,18 @@ public class HomeTest extends Activity{
                     }
 
 
+                    URL imageUrl = new URL("https://s.zkcdn.net/Advertisers/0903335e9cdf4cba877df66c9ef33c4c.png");
+                    InputStream is = imageUrl.openConnection().getInputStream();
+                    final Bitmap bitMap = BitmapFactory.decodeStream(is);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             String response = sb.toString();
-                            Log.println(1,null,response);
-                            TextView output = (TextView) findViewById(R.id.artist);
+                            Log.println(1, null, response);
+                            TextView output = (TextView) findViewById(R.id.output);
                             output.setText(response);
+                            ImageView artistLogo = (ImageView) findViewById(R.id.artistLogo);
+                            artistLogo.setImageBitmap(bitMap);
                         }
                     });
 
