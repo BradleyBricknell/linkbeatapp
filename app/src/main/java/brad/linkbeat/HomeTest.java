@@ -18,6 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import android.app.Activity;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -36,7 +37,6 @@ import android.widget.Toast;
 import com.acrcloud.rec.sdk.ACRCloudClient;
 import com.acrcloud.rec.sdk.ACRCloudConfig;
 import com.acrcloud.rec.sdk.IACRCloudListener;
-import org.apache.commons.codec.binary.Base64;
 import android.graphics.Bitmap;
 
 import org.w3c.dom.Text;
@@ -101,8 +101,7 @@ public class HomeTest extends Activity {
 
     }
     private String encodeBase64(byte[] bstr) {
-        Base64 base64 = new Base64();
-        return new String(base64.encode(bstr));
+        return new String(Base64.encode(bstr, Base64.NO_WRAP));
     }
 
     private String encryptByHMACSHA1(byte[] data, byte[] key) {
@@ -166,7 +165,7 @@ public class HomeTest extends Activity {
         private String getDataFromFingerPrint(byte[] fingerPrint){
             String contentType = "multipart/form-data";
             byte[] sampleData = fingerPrint;
-            String httpUrl = "http://ap-southeast-1.api.acrcloud.com/v1/identify/";
+            String httpUrl = "http://ap-southeast-1.api.acrcloud.com/v1/identify";
             String accessKey = "83cdb4671a18926e305e55430a0a3564";
             String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAlqNsW";
             Long ts = System.currentTimeMillis();
@@ -175,7 +174,6 @@ public class HomeTest extends Activity {
             String sigVersion = "1";
             String sigString = httpUrl + "\n" + accessKey + "\n" + queryType + "\n" + sigVersion + "\n" + timeStamp;
             String signature = encryptByHMACSHA1(sigString.getBytes(), accessSecret.getBytes());
-            //Integer.toString(sigString.getBytes().hashCode());
 
             Map<String, Object> postParams = new HashMap<String, Object>();
             postParams.put("access_key", accessKey);
@@ -185,6 +183,7 @@ public class HomeTest extends Activity {
             postParams.put("signature", signature);
             postParams.put("data_type", queryType);
             postParams.put("signature_version", sigVersion);
+            Log.e("@Params", postParams.toString());
             final String response = httpReq(_POST, httpUrl, contentType);
             Log.e("ACRCloud:", response);
             return response;
@@ -250,9 +249,11 @@ public class HomeTest extends Activity {
             }
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", contentType);
             connection.setRequestMethod(method);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Accept-Charset", "utf-8");
+            connection.setRequestProperty("Content-Type", contentType);
+
             OutputStreamWriter request = new OutputStreamWriter(connection.getOutputStream());
             //request.write(params);
             request.flush();
