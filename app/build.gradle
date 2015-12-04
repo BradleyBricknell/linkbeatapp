@@ -24,5 +24,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
+    compile files('libs/commons-codec-1.10.jar')
+    compile fileTree(dir: "libs", include: 'native-libs.jar')
+    compile fileTree(dir: 'libs', include: '*.jar')
+
 
 }

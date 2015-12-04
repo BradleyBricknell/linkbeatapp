@@ -19,7 +19,6 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,29 +31,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.acrcloud.rec.sdk.ACRCloudClient;
-import com.acrcloud.rec.sdk.ACRCloudConfig;
-import com.acrcloud.rec.sdk.IACRCloudListener;
 import android.graphics.Bitmap;
-
-import org.w3c.dom.Text;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class HomeTest extends Activity {
 
-    private ACRCloudClient mClient;
-    private ACRCloudConfig mConfig;
-    private IACRCloudListener listener;
     private FileInputStream fis;
     private ByteArrayOutputStream bos;
-
-
-    private boolean mProcessing = false;
-    // private String mResult;
 
     private String path = "";
 
@@ -63,6 +48,11 @@ public class HomeTest extends Activity {
 
     private String _POST = "POST";
     private String _GET = "GET";
+    private Map _PLACEHOLDERMAP = new HashMap<>();
+    private String BOUNDARYSTR = "*****2015.03.30.acrcloud.rec.copyright." + System.currentTimeMillis() + "*****";
+    private String BOUNDARY = "--" + BOUNDARYSTR + "\r\n";
+    private String ENDBOUNDARY = "--" + BOUNDARYSTR + "--\r\n\r\n";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,18 +94,18 @@ public class HomeTest extends Activity {
         return new String(Base64.encode(bstr, Base64.NO_WRAP));
     }
 
-    private String encryptByHMACSHA1(byte[] data, byte[] key) {
-        try {
-            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(signingKey);
-            byte[] rawHmac = mac.doFinal(data);
-            return encodeBase64(rawHmac);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
+//    private String encryptByHMACSHA1(byte[] data, byte[] key) {
+//        try {
+//            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
+//            Mac mac = Mac.getInstance("HmacSHA1");
+//            mac.init(signingKey);
+//            byte[] rawHmac = mac.doFinal(data);
+//            return encodeBase64(rawHmac);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return "";
+//    }
 
     public void start() {
         File toDelete = new File(fileName);
@@ -163,43 +153,25 @@ public class HomeTest extends Activity {
         }
     }
         private String getDataFromFingerPrint(byte[] fingerPrint){
-            String contentType = "multipart/form-data";
-            byte[] sampleData = fingerPrint;
-            String httpUrl = "http://ap-southeast-1.api.acrcloud.com/v1/identify";
             String accessKey = "83cdb4671a18926e305e55430a0a3564";
-            String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAlqNsW";
-            Long ts = System.currentTimeMillis();
-            String timeStamp = ts.toString();
-            String queryType = "fingerprint";
-            String sigVersion = "1";
-            String sigString = httpUrl + "\n" + accessKey + "\n" + queryType + "\n" + sigVersion + "\n" + timeStamp;
-            String signature = encryptByHMACSHA1(sigString.getBytes(), accessSecret.getBytes());
+            String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
 
-            Map<String, Object> postParams = new HashMap<String, Object>();
+            Map<String, Object> postParams = new HashMap<>();
+            postParams.put("host", "ap-southeast-1.api.acrcloud.com");
             postParams.put("access_key", accessKey);
-            postParams.put("sample_bytes", sampleData.length + "");
-            postParams.put("sample", sampleData);
-            postParams.put("timestamp", timeStamp);
-            postParams.put("signature", signature);
-            postParams.put("data_type", queryType);
-            postParams.put("signature_version", sigVersion);
+            postParams.put("access_secret", accessSecret);
+            postParams.put("debug", false);
+            postParams.put("timeout", 10);
+
+            ACRCloudRecognizer re = new ACRCloudRecognizer(postParams);
             Log.e("@Params", postParams.toString());
-            final String response = httpReq(_POST, httpUrl, contentType);
+              String response  = re.recognizeByFileBuffer(fingerPrint, fingerPrint.length, 0);
+            System.out.println(response);
             Log.e("ACRCloud:", response);
             return response;
         }
 
 
-
-
-    protected void cancel() {
-        if (mProcessing && this.mClient != null) {
-            this.mClient.stop();
-            //   tv_time.setText("");
-            //  mResult.setText("");
-        }
-        mProcessing = false;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -225,19 +197,21 @@ public class HomeTest extends Activity {
         String oldRes = (String) output.getText();
         output.setText(oldRes + "\n" + result);
 
-        if (this.mClient != null) {
-            this.mClient.stop();
-            mProcessing = false;
-
-
-        }
     }
 
     public void onVolumeChanged(double volume) {
         //  mVolume.setText(getResources().getString(R.string.app_name) + volume);
     }
 
-    public String httpReq(String method, String httpUrl, String contentType) {
+    public String httpReq(String method, String httpUrl, String contentType, Map<String, Object> requestParams) {
+        String stringKeyHeader = BOUNDARY +
+                "Content-Disposition: form-data; name=\"%s\"" +
+                "\r\n\r\n%s\r\n";
+        String filePartHeader = BOUNDARY +
+                "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n" +
+                "Content-Type: application/octet-stream\r\n\r\n";
+        OutputStreamWriter request;
+        BufferedReader isr;
         Log.e("method", method);
         final StringBuilder sb = new StringBuilder();
         try {
@@ -251,24 +225,36 @@ public class HomeTest extends Activity {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
             connection.setDoOutput(true);
+            connection.setDoInput(true);
             connection.setRequestProperty("Accept-Charset", "utf-8");
             connection.setRequestProperty("Content-Type", contentType);
-
-            OutputStreamWriter request = new OutputStreamWriter(connection.getOutputStream());
-            //request.write(params);
+            request = new OutputStreamWriter(connection.getOutputStream());
+            ByteArrayOutputStream postBufferStream = new ByteArrayOutputStream();
+            if(requestParams.size() > 0) {
+                for (String key : requestParams.keySet()) {
+                    Object value = requestParams.get(key);
+                    if(value instanceof String ||value instanceof Integer){
+                        postBufferStream.write(String.format(stringKeyHeader, key, value).getBytes());
+                    } else if(value instanceof byte[]){
+                        postBufferStream.write(String.format(filePartHeader, key, key).getBytes());
+                        postBufferStream.write((byte[])value);
+                        postBufferStream.write("\r\n".getBytes());
+                    }
+                }
+                postBufferStream.write(ENDBOUNDARY.getBytes());
+                request.write(postBufferStream.toByteArray().toString());
+            }
             request.flush();
             request.close();
-            String line = "";
 
-
-            InputStreamReader isr = new InputStreamReader(connection.getInputStream());
+            isr = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            while ((line = isr.readLine()) != null) {
+                sb.append(line);
+            }
             BufferedReader reader = new BufferedReader(isr);
 
-
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "/n");
-            }
-
+            Log.e("code", connection.getContent().toString());
             isr.close();
             reader.close();
         } catch (IOException e) {
@@ -286,7 +272,7 @@ public class HomeTest extends Activity {
                 String bandsInTownUrl = "http://api.bandsintown.com/artists/" + artist.toString().trim() + ".json?api_version=2.0&app_id=linkbeat";
                 String contentType = "application/x-www-form-urlenoded";
                 try {
-                    final String response = httpReq(_GET, bandsInTownUrl, contentType);
+                    final String response = httpReq(_GET, bandsInTownUrl, contentType, _PLACEHOLDERMAP);
                     Log.e("response", response);
                     URL imageUrl = new URL("https://s.zkcdn.net/Advertisers/0903335e9cdf4cba877df66c9ef33c4c.png");
                     InputStream is = imageUrl.openConnection().getInputStream();
@@ -312,9 +298,5 @@ public class HomeTest extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e("MainActivity", "release");
-        if (this.mClient != null) {
-            this.mClient.release();
-            this.mClient = null;
-        }
     }
 }
