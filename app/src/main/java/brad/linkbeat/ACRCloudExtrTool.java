@@ -42,7 +42,6 @@ ACRCloudExtrTool Copyright 2015 ACRCloud v1.0.0
 
 */
 public class ACRCloudExtrTool {
-
     static {
         try {
             System.loadLibrary("acrcloud_extr_tool");
