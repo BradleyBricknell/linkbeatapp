@@ -32,11 +32,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.graphics.Bitmap;
+import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+//import com.acrcloud.rec.sdk.ACRCloudClient;
+//import com.acrcloud.rec.sdk.ACRCloudConfig;
+//import com.acrcloud.rec.sdk.IACRCloudListener;
 
-public class HomeTest extends Activity {
+import org.json.JSONObject;
+
+public class HomeTest extends Activity{
 
     private FileInputStream fis;
     private ByteArrayOutputStream bos;
@@ -53,6 +60,9 @@ public class HomeTest extends Activity {
     private String BOUNDARY = "--" + BOUNDARYSTR + "\r\n";
     private String ENDBOUNDARY = "--" + BOUNDARYSTR + "--\r\n\r\n";
 
+
+    private String _ACRRESPONSE = "{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
+            "12-14 15:17:37.188   ";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,81 +104,80 @@ public class HomeTest extends Activity {
         return new String(Base64.encode(bstr, Base64.NO_WRAP));
     }
 
-//    private String encryptByHMACSHA1(byte[] data, byte[] key) {
-//        try {
-//            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
-//            Mac mac = Mac.getInstance("HmacSHA1");
-//            mac.init(signingKey);
-//            byte[] rawHmac = mac.doFinal(data);
-//            return encodeBase64(rawHmac);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return "";
-//    }
-
+//
     public void start() {
-        File toDelete = new File(fileName);
-        boolean deleted = toDelete.delete();
-        Log.e("deleted", "" + deleted);
-        final MediaRecorder mRecorder = new MediaRecorder();
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mRecorder.setOutputFile(fileName);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        try {
-            TimerTask myTimerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    mRecorder.stop();
-
-                    mRecorder.release();
-                    File packet = new File(fileName);
-                    Log.e("Recorded", String.valueOf(packet.length()));
-                    try {
-                        fis = new FileInputStream(packet);
-                        bos = new ByteArrayOutputStream();
-                        byte[] buffer = new byte[1024];
-                        try {
-                            while ((fis.read(buffer)) != -1) {
-                                bos.write(buffer);
-                            }
-                        } catch (IOException e) {
-                            Log.e("I/O ERROR ", e.getLocalizedMessage());
-                        }
-                    } catch (FileNotFoundException e) {
-                        Log.e("FIle not found", e.getLocalizedMessage());
-                    }
-                    Log.e("Bytes Array", bos.toString());
-                    getDataFromFingerPrint(bos.toByteArray());
-                }
-            };
-            mRecorder.prepare();
-            mRecorder.start();
-            Log.e("Started Recording", this.fileName);
-
-            new Timer().schedule(myTimerTask, 8000);
-        } catch (IOException e) {
-            Log.e("prepare failed", e.getLocalizedMessage());
-        }
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.e("ARTIST ISSSSSSS: ", parseACRCloudResponseOfArtistString(_ACRRESPONSE));
+                // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
+//
+//                String accessKey = "83cdb4671a18926e305e55430a0a3564";
+//                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
+//                Map<String, String> postParams = new HashMap<>();
+//                postParams.put("host", "ap-southeast-1.api.acrcloud.com");
+//                postParams.put("access_key", accessKey);
+//                postParams.put("access_secret", accessSecret);
+//                postParams.put("debug", "false");
+//                postParams.put("timeout", "10");
+//
+//                final ACRCloudClient cc = new ACRCloudClient();
+//                Log.d("RECOGNISE", "SAD JIASIODJIKOAWSDJOSJDIAO");
+//
+//
+//                ACRCloudConfig config = new ACRCloudConfig();
+//                config.accessKey = accessKey;
+//                config.accessSecret = accessSecret;
+//                config.context = getApplicationContext();
+//                config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
+//                config.requestTimeout = 5000;
+//                config.host = "ap-southeast-1.api.acrcloud.com";
+//                config.acrcloudListener = new IACRCloudListener() {
+//                    @Override
+//                    public void onResult(String s) {
+//                        Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
+//                        Log.d("RESULT", s);
+//                        cc.release();
+//                        parseArtistString(s);
+//
+//                    }
+//
+//                    @Override
+//                    public void onVolumeChanged(double v) {
+//                        Log.e("VOLUME CHANGED", "VOLUME CHANGED");
+//                    }
+//                };
+//                cc.initWithConfig(config);
+//                cc.startRecognize();
+            }
+        });
     }
-        private String getDataFromFingerPrint(byte[] fingerPrint){
-            String accessKey = "83cdb4671a18926e305e55430a0a3564";
-            String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
 
-            Map<String, Object> postParams = new HashMap<>();
-            postParams.put("host", "ap-southeast-1.api.acrcloud.com");
-            postParams.put("access_key", accessKey);
-            postParams.put("access_secret", accessSecret);
-            postParams.put("debug", false);
-            postParams.put("timeout", 10);
+        private String parseACRCloudResponseOfArtistString(String ARCCloudJSON){
+            String artist = "";
+            try{
+                JSONObject artistParent = new JSONObject(ARCCloudJSON);
+                try {
+                    JSONObject obj = artistParent.getJSONObject("metadata");
+                    Object art =  obj.getString("music");
 
-            ACRCloudRecognizer re = new ACRCloudRecognizer(postParams);
-            Log.e("@Params", postParams.toString());
-              String response  = re.recognizeByFileBuffer(fingerPrint, fingerPrint.length, 0);
-            System.out.println(response);
-            Log.e("ACRCloud:", response);
-            return response;
+                    JSONArray music = new JSONArray(art.toString());
+                    JSONObject a = music.getJSONObject(0);
+                    Object objArt = a.getString("artists");
+
+                    JSONArray artistJSONArray = new JSONArray(objArt.toString());
+                    JSONObject artistNameObj = artistJSONArray.getJSONObject(0);
+                    Object artistName = artistNameObj.getString("name");
+                    artist = artistName.toString();
+
+                }catch (ClassCastException e){
+                    e.printStackTrace();
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+            return artist;
+
         }
 
 
@@ -192,17 +201,6 @@ public class HomeTest extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onResult(String result) {
-        TextView output = (TextView) findViewById(R.id.output);
-        String oldRes = (String) output.getText();
-        output.setText(oldRes + "\n" + result);
-
-    }
-
-    public void onVolumeChanged(double volume) {
-        //  mVolume.setText(getResources().getString(R.string.app_name) + volume);
-    }
-
     public String httpReq(String method, String httpUrl, String contentType, Map<String, Object> requestParams) {
         String stringKeyHeader = BOUNDARY +
                 "Content-Disposition: form-data; name=\"%s\"" +
@@ -221,7 +219,6 @@ public class HomeTest extends Activity {
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
             connection.setDoOutput(true);
