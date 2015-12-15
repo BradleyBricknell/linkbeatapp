@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -33,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.graphics.Bitmap;
 import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,8 +44,9 @@ import org.json.JSONObject;
 //import com.acrcloud.rec.sdk.IACRCloudListener;
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-public class HomeTest extends Activity{
+public class HomeTest extends Activity {
 
     private FileInputStream fis;
     private ByteArrayOutputStream bos;
@@ -61,8 +64,14 @@ public class HomeTest extends Activity{
     private String ENDBOUNDARY = "--" + BOUNDARYSTR + "--\r\n\r\n";
 
 
-    private String _ACRRESPONSE = "{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
+
+    private String _ACRRESPONSE = "{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"acdc\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"acdc\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"ac\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
             "12-14 15:17:37.188   ";
+
+    //READ ONE - NOW CHANGING "artists" to test other artist pages
+    //"{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
+    //    "12-14 15:17:37.188   ";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +95,7 @@ public class HomeTest extends Activity{
             @Override
             public void onClick(View arg0) {
                 Log.e("bands", "bands");
-                getBandsInTown();
+                getBandsInTown(parseACRCloudResponseOfArtistString(_ACRRESPONSE));
 
 
             }
@@ -100,16 +109,17 @@ public class HomeTest extends Activity{
         });
 
     }
+
     private String encodeBase64(byte[] bstr) {
         return new String(Base64.encode(bstr, Base64.NO_WRAP));
     }
 
-//
+    //
     public void start() {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.e("ARTIST ISSSSSSS: ", parseACRCloudResponseOfArtistString(_ACRRESPONSE));
+                getBandsInTown(parseACRCloudResponseOfArtistString(_ACRRESPONSE));
                 // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
 //
 //                String accessKey = "83cdb4671a18926e305e55430a0a3564";
@@ -138,7 +148,7 @@ public class HomeTest extends Activity{
 //                        Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
 //                        Log.d("RESULT", s);
 //                        cc.release();
-//                        parseArtistString(s);
+//                        parseACRCloudResponseOfArtistString(s);
 //
 //                    }
 //
@@ -153,33 +163,33 @@ public class HomeTest extends Activity{
         });
     }
 
-        private String parseACRCloudResponseOfArtistString(String ARCCloudJSON){
-            String artist = "";
-            try{
-                JSONObject artistParent = new JSONObject(ARCCloudJSON);
-                try {
-                    JSONObject obj = artistParent.getJSONObject("metadata");
-                    Object art =  obj.getString("music");
+    private String parseACRCloudResponseOfArtistString(String ARCCloudJSON) {
+        String artist = "";
+        try {
+            JSONObject artistParent = new JSONObject(ARCCloudJSON);
+            try {
+                JSONObject obj = artistParent.getJSONObject("metadata");
+                Object art = obj.getString("music");
 
-                    JSONArray music = new JSONArray(art.toString());
-                    JSONObject a = music.getJSONObject(0);
-                    Object objArt = a.getString("artists");
+                JSONArray music = new JSONArray(art.toString());
+                JSONObject a = music.getJSONObject(0);
+                Object objArt = a.getString("artists");
 
-                    JSONArray artistJSONArray = new JSONArray(objArt.toString());
-                    JSONObject artistNameObj = artistJSONArray.getJSONObject(0);
-                    Object artistName = artistNameObj.getString("name");
-                    artist = artistName.toString();
+                JSONArray artistJSONArray = new JSONArray(objArt.toString());
+                JSONObject artistNameObj = artistJSONArray.getJSONObject(0);
+                Object artistName = artistNameObj.getString("name");
+                artist = artistName.toString();
 
-                }catch (ClassCastException e){
-                    e.printStackTrace();
-                }
-            }catch (JSONException e){
+            } catch (ClassCastException e) {
                 e.printStackTrace();
             }
-            return artist;
-
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        artist = artist.replaceAll("\\s", "");
+        return artist;
 
+    }
 
 
     @Override
@@ -227,14 +237,15 @@ public class HomeTest extends Activity{
             connection.setRequestProperty("Content-Type", contentType);
             request = new OutputStreamWriter(connection.getOutputStream());
             ByteArrayOutputStream postBufferStream = new ByteArrayOutputStream();
-            if(requestParams.size() > 0) {
+            if (requestParams.size() > 0) {
                 for (String key : requestParams.keySet()) {
                     Object value = requestParams.get(key);
-                    if(value instanceof String ||value instanceof Integer){
+                    if (value instanceof String || value instanceof Integer) {
                         postBufferStream.write(String.format(stringKeyHeader, key, value).getBytes());
-                    } else if(value instanceof byte[]){
+                    } else if (value instanceof byte[]) {
                         postBufferStream.write(String.format(filePartHeader, key, key).getBytes());
-                        postBufferStream.write((byte[])value);
+                        postBufferStream.write((byte[]) value);
+
                         postBufferStream.write("\r\n".getBytes());
                     }
                 }
@@ -261,34 +272,69 @@ public class HomeTest extends Activity{
     }
 
 
-    public void getBandsInTown() {
+    public void getBandsInTown(String artistName) {
+        final String artist = artistName;
+        Log.e("artistName", artistName);
+
         new Thread() {
             public void run() {
-                EditText artistField = (EditText) findViewById(R.id.artist);
-                Editable artist = artistField.getText();
-                String bandsInTownUrl = "http://api.bandsintown.com/artists/" + artist.toString().trim() + ".json?api_version=2.0&app_id=linkbeat";
-                String contentType = "application/x-www-form-urlenoded";
+
+                final String bandsInTownArtistUrl = "http://api.bandsintown.com/artists/" + artist + ".json?api_version=2.0&app_id=linkbeat";
+                final String bandsInTownEventsUrl = "http://api.bandsintown.com/artists/" + artist + "/events.json?api_version=2.0&app_id=linkbeat";
+                Log.e("bandsInTownArtistUrl", bandsInTownArtistUrl);
+                Log.e("bandsInTownEventsUrl", bandsInTownEventsUrl);
+                final String contentType = "application/x-www-form-urlenoded";
+
+                final String response = httpReq(_GET, bandsInTownEventsUrl, contentType, _PLACEHOLDERMAP);
+                Log.e("artistResponse", response);
+
+                final String imageThumbNail;
+                if (response.length() < 3) {
+                    Log.e("Nope", "no current eveeeeeeeeeeeeeeeents");
+                    String backupResponse = httpReq(_GET, bandsInTownArtistUrl, contentType, _PLACEHOLDERMAP);
+                    imageThumbNail = extractThumbNail(backupResponse);
+
+                } else {
+                    imageThumbNail = extractThumbNail(response);
+                }
                 try {
-                    final String response = httpReq(_GET, bandsInTownUrl, contentType, _PLACEHOLDERMAP);
-                    Log.e("response", response);
-                    URL imageUrl = new URL("https://s.zkcdn.net/Advertisers/0903335e9cdf4cba877df66c9ef33c4c.png");
-                    InputStream is = imageUrl.openConnection().getInputStream();
-                    final Bitmap bitMap = BitmapFactory.decodeStream(is);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.println(1, null, response);
-                            TextView output = (TextView) findViewById(R.id.output);
-                            output.setText(response);
-                            ImageView artistLogo = (ImageView) findViewById(R.id.artistLogo);
-                            artistLogo.setImageBitmap(bitMap);
-                        }
-                    });
-                } catch (IOException e) {
-                    Log.e("HTTP: ", e.toString());
+                   final URL imageUrl = new URL(imageThumbNail);
+                runOnUiThread(new Runnable() {
+                    TextView output = (TextView) findViewById(R.id.output);
+                    @Override
+                    public void run() {
+                        output.setText(response);
+                        Log.println(1, null, response);
+                            try {
+                                InputStream is = imageUrl.openConnection().getInputStream();
+                                Bitmap bitMap = BitmapFactory.decodeStream(is);
+                                ImageView artistLogo = (ImageView) findViewById(R.id.artistLogo);
+                                artistLogo.setImageBitmap(bitMap);
+                            } catch (IOException e) {
+                                Log.e("HTTP: ", e.toString());
+                            }
+                    }
+                });
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 }
             }
         }.start();
+    }
+
+
+    private String extractThumbNail(String response) {
+        String imageThumbNail = "";
+        try {
+            JSONObject thumb = new JSONObject(response);
+            JSONObject thumbUrlObj = thumb.getJSONObject("thumb_url");
+            imageThumbNail = thumbUrlObj.toString();
+
+            Log.e("thumbnailurl", imageThumbNail);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return imageThumbNail;
     }
 
     @Override
