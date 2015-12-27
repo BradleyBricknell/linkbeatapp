@@ -24,9 +24,12 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.support.annotation.MainThread;
 import android.util.Base64;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.view.Display;
 import android.os.Environment;
 import android.text.Editable;
 import android.util.DisplayMetrics;
@@ -55,15 +58,6 @@ import org.w3c.dom.Text;
 
 public class HomeTest extends Activity {
 
-    private FileInputStream fis;
-    private ByteArrayOutputStream bos;
-
-    private String path = "";
-
-    private String fileName = Environment.getExternalStorageDirectory().toString()
-            + "/acrcloud/model/linkBeatRecording.3gp";
-
-    private String _POST = "POST";
     private String _GET = "GET";
     private String BOUNDARYSTR = "*****2015.03.30.acrcloud.rec.copyright." + System.currentTimeMillis() + "*****";
     private String BOUNDARY = "--" + BOUNDARYSTR + "\r\n";
@@ -79,7 +73,7 @@ public class HomeTest extends Activity {
     //"{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
     //    "12-14 15:17:37.188   ";
 
-    //From Sttackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
+    //From Stackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
     public static String encodeTobase64(Bitmap image) {
         Bitmap immagex = image;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -90,56 +84,24 @@ public class HomeTest extends Activity {
         return imageEncoded;
     }
 
-    //From Sttackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
-    public static Bitmap decodeBase64(String input) {
-        byte[] decodedByte = Base64.decode(input, 0);
-        return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout);
 
-        path = Environment.getExternalStorageDirectory().toString()
-                + "/acrcloud/model";
-
-        File file = new File(path);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        Button startBtn = (Button) findViewById(R.id.clicky);
-
-        startBtn.setText(getResources().getString(R.string.app_name));
-        //Button cancelBtn = (Button) findViewById(R.id.button);
-        //cancelBtn.setText(getResources().getString(R.string.app_name));
-        findViewById(R.id.bandsInTownButton).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                Log.e("bands", "bands");
-                //  getBandsInTown(parseACRCloudResponseOfArtistString(_ACRRESPONSE));
-
-
-            }
-        });
-        findViewById(R.id.clicky).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                start();
-            }
-        });
     }
 
     //
-    public void start() {
-        //runOnUiThread(new Runnable() {
-        //    @Override
-        //     public void run() {
-        String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
-        setUpProfile(artistInfo);
-        // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
+    public void start(View v) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
+
+                getBandsInTown(artistInfo[1]);
+                setUpProfile(artistInfo);
+
+                // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
 
 //                String accessKey = "83cdb4671a18926e305e55430a0a3564";
 //                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
@@ -175,9 +137,9 @@ public class HomeTest extends Activity {
 //                };
 //                cc.initWithConfig(config);
 //                cc.startRecognize();
+            }
+        });
     }
-    //  });
-    // }
 
 
     //[0] - unformatted artist name E.g AC/DC
@@ -291,10 +253,10 @@ public class HomeTest extends Activity {
                 if (response.length() < 3) {
                     Log.e("Nope", "no current events");
                     String backupResponse = httpReq(_GET, bandsInTownArtistUrl, contentType);
-                    imageThumbNail = extractArtistThumbNail(backupResponse);
+                    //   imageThumbNail = extractArtistThumbNail(backupResponse);
 
                 } else {
-                    imageThumbNail = extractEventsThumbNail(response);
+                    //   imageThumbNail = extractEventsThumbNail(response);
                     //         Log.e("itisimageThumbNail", imageThumbNail);
                 }
                 //  try {
@@ -320,7 +282,6 @@ public class HomeTest extends Activity {
 //                        Log.e("HTTP: ", e.toString());
 //                    }
 
-
 //                } catch (MalformedURLException e) {
 //                    e.printStackTrace();
 //                }
@@ -330,35 +291,36 @@ public class HomeTest extends Activity {
     }
 
     private void setUpProfile(final String[] artistInfo) {
-        Log.e("setUp", retrieveWikiData(artistInfo[0])[1]);
-        final String trueThumbUrl = retrieveWikiData(artistInfo[0])[1];
-        Log.e("trueThumbUrl", trueThumbUrl);
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.e("setUp", retrieveWikiData(artistInfo[0])[1]);
+                String[] wikiData = retrieveWikiData(artistInfo[0]);
 
+                final String trueThumbUrl = wikiData[1];
+                Display display = getWindowManager().getDefaultDisplay();
+                Point res = new Point();
+                display.getSize(res);
+                final int bitmapWidth = res.y / 7;
+                final int bitmapHeight = res.x / 7;
+                Log.e("trueThumbUrl", wikiData[1]);
 
+                Log.e("THIS ONE IS RUNNING", wikiData[1]);
                 try {
-
-                    URL imageUrl = new URL(trueThumbUrl);
+                    URL imageUrl = new URL(wikiData[1]);
                     try {
-
                         InputStream is = imageUrl.openConnection().getInputStream();
                         final Bitmap bitMap = BitmapFactory.decodeStream(is);
-                        DisplayMetrics displayMetrics = new DisplayMetrics();
-                        final int quarterWidth = displayMetrics.widthPixels / 4;
-                        final int quarterHeight = displayMetrics.heightPixels / 4;
 
                         final ImageView artistLogo = (ImageView) findViewById(R.id.artistLogo);
 
                         String encodedImage = encodeTobase64(bitMap);
                         final byte[] imageAsBytes = Base64.decode(encodedImage, 0);
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-                                artistLogo.setImageBitmap(Bitmap.createScaledBitmap(b, 240, 240, false));
+                                artistLogo.setImageBitmap(Bitmap.createScaledBitmap(b, bitmapWidth, bitmapHeight, false));
                             }
                         });
                     } catch (IOException e) {
@@ -368,10 +330,10 @@ public class HomeTest extends Activity {
                     e.printStackTrace();
                 }
             }
+
+            // getBandsInTown(artistInfo[1]);
+
         }).start();
-
-       // getBandsInTown(artistInfo[1]);
-
     }
 
 

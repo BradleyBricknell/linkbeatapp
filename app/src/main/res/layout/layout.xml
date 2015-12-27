@@ -2,40 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/bandsInTownButton"
-        android:text="BANDSINTOWN"
-        android:layout_width="90dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="275dp"
-        android:layout_marginTop="150dp"
-        />
-
     <TextView
         android:layout_width="193dp"
         android:layout_height="135dp"
         android:text="Placeholder"
         android:id="@+id/output"
-        android:layout_marginTop="250dp"
         android:background="@color/colorAccent"
         android:textColor="@color/white"
 
-      />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:height="300dp" />
 
     <Button
     android:text="ACRCloud"
     android:id="@+id/clicky"
-    android:layout_marginLeft="275dp"
-    android:layout_height="100dp"
+        android:layout_height="100dp"
         android:layout_width="100dp"
-        android:width="50dp"/>
-
-    <EditText
-        android:id="@+id/artist"
-        android:layout_width="261dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="150dp"
-    />
+        android:width="300dp"
+        android:onClick="start"
+        android:height="300dp"
+        android:gravity="center"
+        android:layout_above="@+id/output"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="106dp" />
 
     <ImageView
         android:layout_width="wrap_content"
