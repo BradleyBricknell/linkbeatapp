@@ -2,9 +2,7 @@ package brad.linkbeat;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -12,58 +10,55 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 import android.app.Activity;
-import android.bluetooth.BluetoothClass;
+
 import android.content.Context;
-import android.content.res.Configuration;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
+
 import android.graphics.Color;
 import android.graphics.Point;
-import android.support.annotation.MainThread;
+
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Base64;
-import android.media.MediaRecorder;
+
 import android.os.Bundle;
 import android.view.Display;
-import android.os.Environment;
-import android.text.Editable;
-import android.util.DisplayMetrics;
+
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.graphics.Bitmap;
-import android.widget.Toast;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.acrcloud.rec.sdk.ACRCloudClient;
-import com.acrcloud.rec.sdk.ACRCloudConfig;
-import com.acrcloud.rec.sdk.IACRCloudListener;
-
-import org.json.JSONObject;
 import org.w3c.dom.Text;
 
-public class HomeTest extends Activity {
 
-    private String _GET = "GET";
-    private String BOUNDARYSTR = "*****2015.03.30.acrcloud.rec.copyright." + System.currentTimeMillis() + "*****";
-    private String BOUNDARY = "--" + BOUNDARYSTR + "\r\n";
-    private String ENDBOUNDARY = "--" + BOUNDARYSTR + "--\r\n\r\n";
-    private String _THREADSTRING = "";
+public class linkbeat extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout);
+    }
+
+    final private String _GET = "GET";
     final String contentType = "application/x-www-form-urlenoded";
+    Bitmap tourDateIcon;
 
 
     private String _ACRRESPONSE = "{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"AC/DC\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"AC/DC\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"ac\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
@@ -74,6 +69,7 @@ public class HomeTest extends Activity {
     //    "12-14 15:17:37.188   ";
 
     //From Stackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
+
     public static String encodeTobase64(Bitmap image) {
         Bitmap immagex = image;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -84,24 +80,17 @@ public class HomeTest extends Activity {
         return imageEncoded;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout);
-
-    }
 
     //
     public void start(View v) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
+        String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
+        TextView textView = (TextView) findViewById(R.id.artistTitle);
+        textView.setText(artistInfo[0]);
+        retrieveWikiData(artistInfo[0]);
+        getBandsInTown(artistInfo[1]);
 
-                getBandsInTown(artistInfo[1]);
-                setUpProfile(artistInfo);
 
-                // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
+        // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
 
 //                String accessKey = "83cdb4671a18926e305e55430a0a3564";
 //                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
@@ -137,8 +126,7 @@ public class HomeTest extends Activity {
 //                };
 //                cc.initWithConfig(config);
 //                cc.startRecognize();
-            }
-        });
+
     }
 
 
@@ -200,7 +188,6 @@ public class HomeTest extends Activity {
     public String httpReq(String method, String httpUrl, String contentType) {
         OutputStreamWriter request;
         BufferedReader isr;
-        Log.e("method", method);
         final StringBuilder sb = new StringBuilder();
         try {
             URL url = null;
@@ -225,61 +212,131 @@ public class HomeTest extends Activity {
                 sb.append(line);
             }
             BufferedReader reader = new BufferedReader(isr);
-            Log.e("code", connection.getContent().toString());
             isr.close();
             reader.close();
         } catch (IOException e) {
-            Log.e("HTTP GET: ", e.toString());
         }
         return sb.toString();
     }
 
 
+    public void setBitmapForTourDates() {
+        Thread getBuyImageThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL imageUrl = new URL("http://i.imgur.com/ATl96GN.png");
+                    try {
+                        InputStream is = imageUrl.openConnection().getInputStream();
+                        final Bitmap bitMap = BitmapFactory.decodeStream(is);
+                        String encodedImage = encodeTobase64(bitMap);
+                        final byte[] imageAsBytes = Base64.decode(encodedImage, 0);
+                        Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+                        tourDateIcon = b;
+                    } catch (IOException e) {
+                        Log.d("HTTP: ", e.toString());
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        };
+        getBuyImageThread.start();
+    }
+
+
+    public void makeTourDatesTable(final String response, final int tourDateCount, final Context context) {
+        setBitmapForTourDates();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("makeTourDatesTable", "ADDING ROWS");
+                TableLayout tl = (TableLayout) findViewById(R.id.tourDatesTable);
+                TableRow row;
+                if (tourDateCount < 1) {
+                    row = new TableRow(context);
+                    TextView noEventMessage = new TextView(context);
+                    noEventMessage.setText("No Events Available");
+                    row.addView(noEventMessage);
+                    tl.addView(row);
+                } else {
+                    for (int counter = 0; counter < tourDateCount; counter++) {
+                        row = new TableRow(context);
+                        final ImageView button = new ImageButton(context);
+                        final String ticketUrl = extractEventsTicketUrl(response, counter);
+                        button.setImageBitmap(tourDateIcon);
+                        button.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                Intent intent = new Intent();
+                                intent.setAction(Intent.ACTION_VIEW);
+                                intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                                intent.setData(Uri.parse(ticketUrl));
+                                startActivity(intent);
+                            }
+                        });
+                        TextView dateTime = new TextView(context);
+                        dateTime.setText(extractEventDateTime(response, counter));
+                        TextView location = new TextView(context);
+                        location.setText(extractEventsLocation(response, counter));
+                        dateTime.setTextColor(Color.BLACK);
+                        location.setTextColor(Color.BLACK);
+                        row.addView(button);
+                        row.addView(dateTime);
+                        row.addView(location);
+                        tl.addView(row, counter);
+                        Log.d("adding rows", Integer.toString(counter));
+                        Log.e("Thread.activeCount", Integer.toString(Thread.activeCount()));
+                    }
+
+
+                }
+            }
+        });
+
+    }
+
+    public int getTourDatesCount(String response) {
+        int tourDateCount = 0;
+        try {
+            JSONArray responseAsArray = new JSONArray(response);
+            tourDateCount = responseAsArray.length();
+            Log.e("tourDateCount", Integer.toString(tourDateCount));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return tourDateCount;
+    }
+
     public void getBandsInTown(final String artistName) {
         final String artist = artistName;
-        Log.e("artistName", artistName);
-        final String bandsInTownArtistUrl = "http://api.bandsintown.com/artists/" + artist + ".json?api_version=2.0&app_id=linkbeat";
+        Log.d("artistName", artistName);
         final String bandsInTownEventsUrl = "http://api.bandsintown.com/artists/" + artist + "/events.json?api_version=2.0&app_id=linkbeat";
-        Log.e("bandsInTownArtistUrl", bandsInTownArtistUrl);
-        Log.e("bandsInTownEventsUrl", bandsInTownEventsUrl);
+        Log.d("bandsInTownEventsUrl", bandsInTownEventsUrl);
         final String contentType = "application/x-www-form-urlenoded";
 
-        new Thread(new Runnable() {
+        Thread bandsInTownThread = new Thread() {
             @Override
             public void run() {
                 final String response = httpReq(_GET, bandsInTownEventsUrl, contentType);
-                Log.e("artistResponse", response);
-                final String imageThumbNail;
-                if (response.length() < 3) {
-                    Log.e("Nope", "no current events");
-                    String backupResponse = httpReq(_GET, bandsInTownArtistUrl, contentType);
-                    //   imageThumbNail = extractArtistThumbNail(backupResponse);
+                Log.d("artistResponse", response);
+                makeTourDatesTable(response, getTourDatesCount(response), getBaseContext());
 
-                } else {
-                    //   imageThumbNail = extractEventsThumbNail(response);
-                    //         Log.e("itisimageThumbNail", imageThumbNail);
-                }
                 //  try {
                 //       final URL imageUrl = new URL(imageThumbNail);
                 //        try {
                 //   InputStream is = imageUrl.openConnection().getInputStream();
 //                        final Bitmap bitMap = BitmapFactory.decodeStream(is);
-//                        final ImageView artistLogo = (ImageView) findViewById(R.id.artistLogo);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //      artistLogo.setImageBitmap(bitMap);
-                        TextView output = (TextView) findViewById(R.id.output);
-                        output.setText(artistName + " touring data = ");
-                        output.append(extractEventDateTime(response));
-                        output.append(extractEventsLocation(response));
-                        output.append(extractEventsTicketUrl(response));
-                        output.append(extractEventsTicketStatus(response));
+//                        final ImageView artistLogo = (ImageView) findView(R.id.artistLogo);
 
-                    }
-                });
+                //      artistLogo.setImageBitmap(bitMap);
+                Log.d("datetime", extractEventDateTime(response, 0));
+                Log.d("location", extractEventsLocation(response, 0));
+                Log.d("ticketUrl", extractEventsTicketUrl(response, 0));
+                Log.d("ticketStatus", extractEventsTicketStatus(response, 0));
+
 //                    } catch (IOException e) {
-//                        Log.e("HTTP: ", e.toString());
+//                        Log.d("HTTP: ", e.toString());
 //                    }
 
 //                } catch (MalformedURLException e) {
@@ -287,33 +344,26 @@ public class HomeTest extends Activity {
 //                }
             }
 
-        }).start();
+        };
+        bandsInTownThread.start();
     }
 
-    private void setUpProfile(final String[] artistInfo) {
-        new Thread(new Runnable() {
+    private void setUpProfile(final String[] wikiInfo) {
+        Thread setupThread = new Thread() {
             @Override
             public void run() {
-                Log.e("setUp", retrieveWikiData(artistInfo[0])[1]);
-                String[] wikiData = retrieveWikiData(artistInfo[0]);
-
-                final String trueThumbUrl = wikiData[1];
+                Log.e("profile", "profile");
                 Display display = getWindowManager().getDefaultDisplay();
                 Point res = new Point();
                 display.getSize(res);
-                final int bitmapWidth = res.y / 7;
-                final int bitmapHeight = res.x / 7;
-                Log.e("trueThumbUrl", wikiData[1]);
-
-                Log.e("THIS ONE IS RUNNING", wikiData[1]);
+                final int bitmapWidth = res.y / 4;
+                final int bitmapHeight = res.x / 4;
                 try {
-                    URL imageUrl = new URL(wikiData[1]);
+                    URL imageUrl = new URL(wikiInfo[0]);
                     try {
                         InputStream is = imageUrl.openConnection().getInputStream();
                         final Bitmap bitMap = BitmapFactory.decodeStream(is);
-
                         final ImageView artistLogo = (ImageView) findViewById(R.id.artistLogo);
-
                         String encodedImage = encodeTobase64(bitMap);
                         final byte[] imageAsBytes = Base64.decode(encodedImage, 0);
                         runOnUiThread(new Runnable() {
@@ -324,39 +374,25 @@ public class HomeTest extends Activity {
                             }
                         });
                     } catch (IOException e) {
-                        Log.e("HTTP: ", e.toString());
+                        Log.d("HTTP: ", e.toString());
                     }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
             }
-
-            // getBandsInTown(artistInfo[1]);
-
-        }).start();
+        };
+        setupThread.start();
     }
 
-
-    private String extractArtistThumbNail(String response) {
-        String imageThumbNail = "";
-        try {
-            JSONObject thumb = new JSONObject(response);
-            imageThumbNail = thumb.getString("thumb_url");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return imageThumbNail;
-    }
-
-    private String extractEventsThumbNail(String response) {
+    private String extractEventsThumbNail(String response, int index) {
         String imageThumbNail = "";
         try {
             JSONArray thumb = new JSONArray(response);
-            JSONObject thumbUrlObj = thumb.getJSONObject(0);
+            JSONObject thumbUrlObj = thumb.getJSONObject(index);
             Object tn = thumbUrlObj.getString("artists");
 
             JSONArray thumbChild = new JSONArray(tn.toString());
-            JSONObject thumbUrlObjChild1 = thumbChild.getJSONObject(0);
+            JSONObject thumbUrlObjChild1 = thumbChild.getJSONObject(index);
             Object urlOjb = thumbUrlObjChild1.getString("thumb_url");
             imageThumbNail = urlOjb.toString();
         } catch (JSONException e) {
@@ -366,80 +402,83 @@ public class HomeTest extends Activity {
     }
 
 
-    private String extractEventDateTime(String response) {
+    private String extractEventDateTime(String response, int index) {
         String dateTime = "";
         try {
             JSONArray dt = new JSONArray(response);
-            JSONObject dateTimeObj = dt.getJSONObject(0);
+            JSONObject dateTimeObj = dt.getJSONObject(index);
             dateTime = dateTimeObj.getString("datetime");
-            Log.e("dateTime", dateTime);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return dateTime;
     }
 
-    private String extractEventsTicketUrl(String response) {
+    private String extractEventsTicketUrl(String response, int index) {
         String ticketUrl = "";
         try {
             JSONArray tu = new JSONArray(response);
-            JSONObject ticketUrlObj = tu.getJSONObject(0);
+            JSONObject ticketUrlObj = tu.getJSONObject(index);
             ticketUrl = ticketUrlObj.getString("ticket_url");
-            Log.e("ticketUrl", ticketUrl);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return ticketUrl;
     }
 
-    private String extractEventsTicketStatus(String response) {
+    private String extractEventsTicketStatus(String response, int index) {
         String ticketStatus = "";
         try {
             JSONArray ts = new JSONArray(response);
-            JSONObject ticketStatusObj = ts.getJSONObject(0);
+            JSONObject ticketStatusObj = ts.getJSONObject(index);
             ticketStatus = ticketStatusObj.getString("ticket_status");
-            Log.e("ticketStatus", ticketStatus);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return ticketStatus;
     }
 
-    private String extractEventsLocation(String response) {
+    private String extractEventsLocation(String response, int index) {
         String location = "";
         try {
             JSONArray loc = new JSONArray(response);
-            JSONObject locationObj = loc.getJSONObject(0);
+            JSONObject locationObj = loc.getJSONObject(index);
             location = locationObj.getString("formatted_location");
-            Log.e("location", location);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return location;
     }
 
-    //wiki data consists of
-    //[0] - extract about artist
-    //[1] - url for thumbnail
-    private String[] retrieveWikiData(final String artistName) {
+    //invokes setupProfile parsing in wikiData[]
+    // [0] wiki thumburl
+    // [1] wiki extract
+
+    private void retrieveWikiData(final String artistName) {
         final String[] wikiData = new String[2];
 
         final String wikiAPITitlesUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&titles=";
         final String wikiAPIImagesUrlHead = "https://en.wikipedia.org/w/api.php?action=query&pageids=";
         final String wikiAPIImagesUrlTail = "&prop=pageimages&format=json&pilimit=1&pithumbsize=300";
 
-        new Thread(new Runnable() {
+        //Set ProfileUrl
+        Thread wikiThread = new Thread() {
             @Override
             public void run() {
-                final String pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + artistName, contentType));
-                setThreadString(getWikiThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail, contentType), pageId));
-                Log.e("getThreadString", wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail);
+                String pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + artistName, contentType));
+                wikiData[0] = getWikiThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail, contentType), pageId);
+                // Log.d("profileUrl", profileUrl);
+
+                Log.e("wikiData[0]", wikiData[0]);
+                setUpProfile(wikiData);
             }
-        }).start();
-        wikiData[1] = getThreadString();
-        Log.e("artistData[1]", wikiData[1]);
-        return wikiData;
+        };
+        wikiThread.start();
+
+
+        /// /return profileUrl;
     }
+
 
     private String parsePageIds(String wikiResponse) {
         String pageIds = "";
@@ -471,7 +510,7 @@ public class HomeTest extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.e("getWikiThumbUrl3", sourceString);
+        Log.d("sourceString", sourceString);
         return sourceString;
     }
 
@@ -481,18 +520,18 @@ public class HomeTest extends Activity {
         return artistExtract;
     }
 
-    private String getThreadString() {
-        return _THREADSTRING;
-    }
-
-    private void setThreadString(String newString) {
-        _THREADSTRING = newString;
-        Log.e("SETTING STRING: ", newString);
-    }
+//    private String getThreadString() {
+//        Log.d("getThreadString", "s" + _THREADSTRING + "e");
+//        return _THREADSTRING;
+//    }
+//
+//    private void setThreadString(String newString) {
+//        _THREADSTRING = newString;
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("MainActivity", "release");
+        Log.d("MainActivity", "release");
     }
 }
