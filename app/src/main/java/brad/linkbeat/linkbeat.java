@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import android.app.Activity;
@@ -40,7 +42,12 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.graphics.Bitmap;
+import android.widget.Toast;
 
+
+import com.acrcloud.rec.sdk.ACRCloudClient;
+import com.acrcloud.rec.sdk.ACRCloudConfig;
+import com.acrcloud.rec.sdk.IACRCloudListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -90,43 +97,46 @@ public class linkbeat extends Activity {
         getBandsInTown(artistInfo[1]);
 
 
-        // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
-
-//                String accessKey = "83cdb4671a18926e305e55430a0a3564";
-//                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
-//                Map<String, String> postParams = new HashMap<>();
-//                postParams.put("host", "ap-southeast-1.api.acrcloud.com");
-//                postParams.put("access_key", accessKey);
-//                postParams.put("access_secret", accessSecret);
-//                postParams.put("debug", "false");
-//                postParams.put("timeout", "10");
+//        String accessKey = "83cdb4671a18926e305e55430a0a3564";
+//        String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
+//        Map<String, String> postParams = new HashMap<>();
+//        postParams.put("host", "ap-southeast-1.api.acrcloud.com");
+//        postParams.put("access_key", accessKey);
+//        postParams.put("access_secret", accessSecret);
+//        postParams.put("debug", "false");
+//        postParams.put("timeout", "10");
 //
-//                final ACRCloudClient cc = new ACRCloudClient();
+//        final ACRCloudClient cc = new ACRCloudClient();
 //
-//                ACRCloudConfig config = new ACRCloudConfig();
-//                config.accessKey = accessKey;
-//                config.accessSecret = accessSecret;
-//                config.context = getApplicationContext();
-//                config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
-//                config.requestTimeout = 5000;
-//                config.host = "ap-southeast-1.api.acrcloud.com";
-//                config.acrcloudListener = new IACRCloudListener() {
-//                    @Override
-//                    public void onResult(String s) {
-//                        Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
-//                        Log.d("RESULT", s);
-//                        cc.release();
-//                        getBandsInTown(parseACRCloudResponseOfArtistString(s));
-//                    }
+//        ACRCloudConfig config = new ACRCloudConfig();
+//        config.accessKey = accessKey;
+//        config.accessSecret = accessSecret;
+//        config.context = getApplicationContext();
+//        config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
+//        config.requestTimeout = 5000;
+//        config.host = "ap-southeast-1.api.acrcloud.com";
+//        config.acrcloudListener = new IACRCloudListener() {
+//            @Override
+//            public void onResult(String s) {
+//                Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
+//                Log.d("RESULT", s);
+//                cc.release();
+//                String[] artistInfo = parseACRCloudResponseOfArtistString(s);
+//                TextView textView = (TextView) findViewById(R.id.artistTitle);
+//                textView.setText(artistInfo[0]);
+//                retrieveWikiData(artistInfo[0]);
+//                getBandsInTown(artistInfo[1]);
 //
-//                    @Override
-//                    public void onVolumeChanged(double v) {
+//            }
 //
-//                    }
-//                };
-//                cc.initWithConfig(config);
-//                cc.startRecognize();
-
+//            @Override
+//            public void onVolumeChanged(double v) {
+//
+//            }
+//        };
+//        cc.initWithConfig(config);
+//        cc.startRecognize();
+//
     }
 
 
@@ -253,16 +263,18 @@ public class linkbeat extends Activity {
             public void run() {
                 Log.d("makeTourDatesTable", "ADDING ROWS");
                 TableLayout tl = (TableLayout) findViewById(R.id.tourDatesTable);
+                tl.removeAllViews();
                 TableRow row;
-                if (tourDateCount < 1) {
+                if (tourDateCount == 0) {
                     row = new TableRow(context);
                     TextView noEventMessage = new TextView(context);
-                    noEventMessage.setText("No Events Available");
+                    noEventMessage.setText("Sorry! Not Currently Touring!");
                     row.addView(noEventMessage);
                     tl.addView(row);
                 } else {
                     for (int counter = 0; counter < tourDateCount; counter++) {
                         row = new TableRow(context);
+                        row.setPadding(8, 0, 5, 0);
                         final ImageView button = new ImageButton(context);
                         final String ticketUrl = extractEventsTicketUrl(response, counter);
                         button.setImageBitmap(tourDateIcon);
@@ -289,16 +301,18 @@ public class linkbeat extends Activity {
                         Log.e("Thread.activeCount", Integer.toString(Thread.activeCount()));
                     }
 
-
                 }
             }
         });
-
     }
 
     public int getTourDatesCount(String response) {
         int tourDateCount = 0;
         try {
+            Log.e("getTourDatesResponse", response);
+            if (response.equals("[]")) {
+                return 0;
+            }
             JSONArray responseAsArray = new JSONArray(response);
             tourDateCount = responseAsArray.length();
             Log.e("tourDateCount", Integer.toString(tourDateCount));
@@ -322,26 +336,11 @@ public class linkbeat extends Activity {
                 Log.d("artistResponse", response);
                 makeTourDatesTable(response, getTourDatesCount(response), getBaseContext());
 
-                //  try {
-                //       final URL imageUrl = new URL(imageThumbNail);
-                //        try {
-                //   InputStream is = imageUrl.openConnection().getInputStream();
-//                        final Bitmap bitMap = BitmapFactory.decodeStream(is);
-//                        final ImageView artistLogo = (ImageView) findView(R.id.artistLogo);
-
-                //      artistLogo.setImageBitmap(bitMap);
                 Log.d("datetime", extractEventDateTime(response, 0));
                 Log.d("location", extractEventsLocation(response, 0));
                 Log.d("ticketUrl", extractEventsTicketUrl(response, 0));
                 Log.d("ticketStatus", extractEventsTicketStatus(response, 0));
 
-//                    } catch (IOException e) {
-//                        Log.d("HTTP: ", e.toString());
-//                    }
-
-//                } catch (MalformedURLException e) {
-//                    e.printStackTrace();
-//                }
             }
 
         };
@@ -352,7 +351,6 @@ public class linkbeat extends Activity {
         Thread setupThread = new Thread() {
             @Override
             public void run() {
-                Log.e("profile", "profile");
                 Display display = getWindowManager().getDefaultDisplay();
                 Point res = new Point();
                 display.getSize(res);
@@ -414,6 +412,7 @@ public class linkbeat extends Activity {
         return dateTime;
     }
 
+
     private String extractEventsTicketUrl(String response, int index) {
         String ticketUrl = "";
         try {
@@ -455,17 +454,19 @@ public class linkbeat extends Activity {
     // [1] wiki extract
 
     private void retrieveWikiData(final String artistName) {
+        final String wikiArtistName = artistName.replace(" ", "_");
         final String[] wikiData = new String[2];
 
         final String wikiAPITitlesUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&titles=";
         final String wikiAPIImagesUrlHead = "https://en.wikipedia.org/w/api.php?action=query&pageids=";
         final String wikiAPIImagesUrlTail = "&prop=pageimages&format=json&pilimit=1&pithumbsize=300";
-
+        Log.e("ARTISTNAME", wikiArtistName);
         //Set ProfileUrl
         Thread wikiThread = new Thread() {
             @Override
             public void run() {
-                String pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + artistName, contentType));
+
+                String pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName, contentType));
                 wikiData[0] = getWikiThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail, contentType), pageId);
                 // Log.d("profileUrl", profileUrl);
 
