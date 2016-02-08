@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import android.app.Activity;
@@ -40,7 +42,12 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.graphics.Bitmap;
+import android.widget.Toast;
 
+
+import com.acrcloud.rec.sdk.ACRCloudClient;
+import com.acrcloud.rec.sdk.ACRCloudConfig;
+import com.acrcloud.rec.sdk.IACRCloudListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,49 +90,54 @@ public class linkbeat extends Activity {
 
     //
     public void start(View v) {
-        String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
-        TextView textView = (TextView) findViewById(R.id.artistTitle);
-        textView.setText(artistInfo[0]);
-        retrieveWikiData(artistInfo[0]);
-        getBandsInTown(artistInfo[1]);
+//        String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
+//        TextView textView = (TextView) findViewById(R.id.artistTitle);
+//        textView.setText(artistInfo[0]);
+//        retrieveWikiData(artistInfo[0]);
+//        getBandsInTown(artistInfo[1]);
 
 
         // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
 
-//                String accessKey = "83cdb4671a18926e305e55430a0a3564";
-//                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
-//                Map<String, String> postParams = new HashMap<>();
-//                postParams.put("host", "ap-southeast-1.api.acrcloud.com");
-//                postParams.put("access_key", accessKey);
-//                postParams.put("access_secret", accessSecret);
-//                postParams.put("debug", "false");
-//                postParams.put("timeout", "10");
-//
-//                final ACRCloudClient cc = new ACRCloudClient();
-//
-//                ACRCloudConfig config = new ACRCloudConfig();
-//                config.accessKey = accessKey;
-//                config.accessSecret = accessSecret;
-//                config.context = getApplicationContext();
-//                config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
-//                config.requestTimeout = 5000;
-//                config.host = "ap-southeast-1.api.acrcloud.com";
-//                config.acrcloudListener = new IACRCloudListener() {
-//                    @Override
-//                    public void onResult(String s) {
-//                        Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
-//                        Log.d("RESULT", s);
-//                        cc.release();
-//                        getBandsInTown(parseACRCloudResponseOfArtistString(s));
-//                    }
-//
-//                    @Override
-//                    public void onVolumeChanged(double v) {
-//
-//                    }
-//                };
-//                cc.initWithConfig(config);
-//                cc.startRecognize();
+                String accessKey = "83cdb4671a18926e305e55430a0a3564";
+                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
+                Map<String, String> postParams = new HashMap<>();
+                postParams.put("host", "ap-southeast-1.api.acrcloud.com");
+                postParams.put("access_key", accessKey);
+                postParams.put("access_secret", accessSecret);
+                postParams.put("debug", "false");
+                postParams.put("timeout", "10");
+
+                final ACRCloudClient cc = new ACRCloudClient();
+
+                ACRCloudConfig config = new ACRCloudConfig();
+                config.accessKey = accessKey;
+                config.accessSecret = accessSecret;
+                config.context = getApplicationContext();
+                config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
+                config.requestTimeout = 5000;
+                config.host = "ap-southeast-1.api.acrcloud.com";
+                config.acrcloudListener = new IACRCloudListener() {
+                    @Override
+                    public void onResult(String s) {
+                        Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
+                        Log.d("RESULT", s);
+                        cc.release();
+                        String[] artistInfo = parseACRCloudResponseOfArtistString(s);
+                        TextView textView = (TextView) findViewById(R.id.artistTitle);
+                        textView.setText(artistInfo[0]);
+                        retrieveWikiData(artistInfo[0]);
+                        getBandsInTown(artistInfo[1]);
+
+                    }
+
+                    @Override
+                    public void onVolumeChanged(double v) {
+
+                    }
+                };
+                cc.initWithConfig(config);
+                cc.startRecognize();
 
     }
 
