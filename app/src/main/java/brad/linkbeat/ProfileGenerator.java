@@ -25,11 +25,12 @@ import android.graphics.Point;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.util.Base64;
 
 import android.os.Bundle;
 import android.view.Display;
-
+import android.view.ViewGroup;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -38,6 +39,8 @@ import android.view.View;
 
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -55,21 +58,25 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 
-public class linkbeat extends Activity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout);
-    }
-
+public class ProfileGenerator extends Activity {
     final private String _GET = "GET";
     final String contentType = "application/x-www-form-urlenoded";
     Bitmap tourDateIcon;
+    private String pageId;
+    private String[] artistInfo;
+    Display display;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log.d("PROFILEGENERATRED", "STARTED");
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout);
+        Bundle b = getIntent().getExtras();
+        artistInfo = b.getStringArray("artistInfo");
+        display = getWindowManager().getDefaultDisplay();
+        buildProfile();
+    }
 
-    private String _ACRRESPONSE = "{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"AC/DC\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"AC/DC\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"ac\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
-            "12-14 15:17:37.188   ";
 
     //REAL ONE - NOW CHANGING "artists" to test other artist pages
     //"{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
@@ -89,97 +96,55 @@ public class linkbeat extends Activity {
 
 
     //
-    public void start(View v) {
-//        String[] artistInfo = parseACRCloudResponseOfArtistString(_ACRRESPONSE);
-//        TextView textView = (TextView) findViewById(R.id.artistTitle);
-//        textView.setText(artistInfo[0]);
-//        retrieveWikiData(artistInfo[0]);
-//        getBandsInTown(artistInfo[1]);
+    public void buildProfile() {
+        TextView textView = (TextView) findViewById(R.id.artistTitle);
+        textView.setText(artistInfo[0]);
+        retrieveWikiData(artistInfo[0]);
+        getBandsInTown(artistInfo[1]);
 
 
-<<<<<<< HEAD
-        String accessKey = "83cdb4671a18926e305e55430a0a3564";
-        String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
-        Map<String, String> postParams = new HashMap<>();
-        postParams.put("host", "ap-southeast-1.api.acrcloud.com");
-        postParams.put("access_key", accessKey);
-        postParams.put("access_secret", accessSecret);
-        postParams.put("debug", "false");
-        postParams.put("timeout", "10");
-
-        final ACRCloudClient cc = new ACRCloudClient();
-
-        ACRCloudConfig config = new ACRCloudConfig();
-        config.accessKey = accessKey;
-        config.accessSecret = accessSecret;
-        config.context = getApplicationContext();
-        config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
-        config.requestTimeout = 5000;
-        config.host = "ap-southeast-1.api.acrcloud.com";
-        config.acrcloudListener = new IACRCloudListener() {
-            @Override
-            public void onResult(String s) {
-                Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
-                Log.d("RESULT", s);
-                cc.release();
-                String[] artistInfo = parseACRCloudResponseOfArtistString(s);
-                TextView textView = (TextView) findViewById(R.id.artistTitle);
-                textView.setText(artistInfo[0]);
-                retrieveWikiData(artistInfo[0]);
-                getBandsInTown(artistInfo[1]);
-
-            }
-
-            @Override
-            public void onVolumeChanged(double v) {
-
-            }
-        };
-        cc.initWithConfig(config);
-        cc.startRecognize();
-=======
         // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
+//
+//        String accessKey = "83cdb4671a18926e305e55430a0a3564";
+//        String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
+//        Map<String, String> postParams = new HashMap<>();
+//        postParams.put("host", "ap-southeast-1.api.acrcloud.com");
+//        postParams.put("access_key", accessKey);
+//        postParams.put("access_secret", accessSecret);
+//        postParams.put("debug", "false");
+//        postParams.put("timeout", "10");
+//
+//        final ACRCloudClient cc = new ACRCloudClient();
+//
+//        ACRCloudConfig config = new ACRCloudConfig();
+//        config.accessKey = accessKey;
+//        config.accessSecret = accessSecret;
+//        config.context = getApplicationContext();
+//        config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
+//        config.requestTimeout = 5000;
+//        config.host = "ap-southeast-1.api.acrcloud.com";
+//        config.acrcloudListener = new IACRCloudListener() {
+//            @Override
+//            public void onResult(String s) {
+//                Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
+//                Log.d("RESULT", s);
+//                cc.release();
+//                String[] artistInfo = parseACRCloudResponseOfArtistString(s);
+//                TextView textView = (TextView) findViewById(R.id.artistTitle);
+//                textView.setText(artistInfo[0]);
+//                retrieveWikiData(artistInfo[0]);
+//                getBandsInTown(artistInfo[1]);
+//
+//            }
+//
+//            @Override
+//            public void onVolumeChanged(double v) {
+//
+//            }
+//        };
+//        cc.initWithConfig(config);
+//        cc.startRecognize();
 
-                String accessKey = "83cdb4671a18926e305e55430a0a3564";
-                String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
-                Map<String, String> postParams = new HashMap<>();
-                postParams.put("host", "ap-southeast-1.api.acrcloud.com");
-                postParams.put("access_key", accessKey);
-                postParams.put("access_secret", accessSecret);
-                postParams.put("debug", "false");
-                postParams.put("timeout", "10");
-
-                final ACRCloudClient cc = new ACRCloudClient();
-
-                ACRCloudConfig config = new ACRCloudConfig();
-                config.accessKey = accessKey;
-                config.accessSecret = accessSecret;
-                config.context = getApplicationContext();
-                config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
-                config.requestTimeout = 5000;
-                config.host = "ap-southeast-1.api.acrcloud.com";
-                config.acrcloudListener = new IACRCloudListener() {
-                    @Override
-                    public void onResult(String s) {
-                        Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
-                        Log.d("RESULT", s);
-                        cc.release();
-                        String[] artistInfo = parseACRCloudResponseOfArtistString(s);
-                        TextView textView = (TextView) findViewById(R.id.artistTitle);
-                        textView.setText(artistInfo[0]);
-                        retrieveWikiData(artistInfo[0]);
-                        getBandsInTown(artistInfo[1]);
-
-                    }
-
-                    @Override
-                    public void onVolumeChanged(double v) {
-
-                    }
-                };
-                cc.initWithConfig(config);
-                cc.startRecognize();
->>>>>>> b24c2fe9b8d9a18391e2d26e99b80bc103213d3f
 
     }
 
@@ -212,7 +177,7 @@ public class linkbeat extends Activity {
         }
         artistArr[0] = artist;
 
-        artist = artist.replaceAll("\\s", "");
+        artist = artist.replaceAll("\\s", "%20");
         artist = artist.replaceAll("/", "");
 
         artistArr[1] = artist;
@@ -305,10 +270,16 @@ public class linkbeat extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                ScrollView  scrollView= (ScrollView) findViewById(R.id.tableScrollView);
+                Point res = new Point();
+                display.getSize(res);
+                scrollView.getLayoutParams().height = res.y / 4;
+
                 Log.d("makeTourDatesTable", "ADDING ROWS");
                 TableLayout tl = (TableLayout) findViewById(R.id.tourDatesTable);
                 tl.removeAllViews();
                 TableRow row;
+
                 if (tourDateCount == 0) {
                     row = new TableRow(context);
                     TextView noEventMessage = new TextView(context);
@@ -318,7 +289,7 @@ public class linkbeat extends Activity {
                 } else {
                     for (int counter = 0; counter < tourDateCount; counter++) {
                         row = new TableRow(context);
-                        row.setPadding(8, 0, 5, 0);
+                        row.setMinimumHeight(100);
                         final ImageView button = new ImageButton(context);
                         final String ticketUrl = extractEventsTicketUrl(response, counter);
                         button.setImageBitmap(tourDateIcon);
@@ -341,10 +312,7 @@ public class linkbeat extends Activity {
                         row.addView(dateTime);
                         row.addView(location);
                         tl.addView(row, counter);
-                        Log.d("adding rows", Integer.toString(counter));
-                        Log.e("Thread.activeCount", Integer.toString(Thread.activeCount()));
                     }
-
                 }
             }
         });
@@ -391,11 +359,11 @@ public class linkbeat extends Activity {
         bandsInTownThread.start();
     }
 
-    private void setUpProfile(final String[] wikiInfo) {
+    private void addWikiElements(final String[] wikiInfo) {
         Thread setupThread = new Thread() {
             @Override
             public void run() {
-                Display display = getWindowManager().getDefaultDisplay();
+
                 Point res = new Point();
                 display.getSize(res);
                 final int bitmapWidth = res.y / 4;
@@ -421,28 +389,12 @@ public class linkbeat extends Activity {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
+                TextView extractView = (TextView) findViewById(R.id.extractView);
+                extractView.setText(wikiInfo[1]);
             }
         };
         setupThread.start();
     }
-
-    private String extractEventsThumbNail(String response, int index) {
-        String imageThumbNail = "";
-        try {
-            JSONArray thumb = new JSONArray(response);
-            JSONObject thumbUrlObj = thumb.getJSONObject(index);
-            Object tn = thumbUrlObj.getString("artists");
-
-            JSONArray thumbChild = new JSONArray(tn.toString());
-            JSONObject thumbUrlObjChild1 = thumbChild.getJSONObject(index);
-            Object urlOjb = thumbUrlObjChild1.getString("thumb_url");
-            imageThumbNail = urlOjb.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return imageThumbNail;
-    }
-
 
     private String extractEventDateTime(String response, int index) {
         String dateTime = "";
@@ -504,18 +456,22 @@ public class linkbeat extends Activity {
         final String wikiAPITitlesUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&titles=";
         final String wikiAPIImagesUrlHead = "https://en.wikipedia.org/w/api.php?action=query&pageids=";
         final String wikiAPIImagesUrlTail = "&prop=pageimages&format=json&pilimit=1&pithumbsize=300";
+        final String wikiAPIExtractUrl = "&prop=extracts&exintro=&explaintext=";
         Log.e("ARTISTNAME", wikiArtistName);
         //Set ProfileUrl
         Thread wikiThread = new Thread() {
             @Override
             public void run() {
 
-                String pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName, contentType));
-                wikiData[0] = getWikiThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail, contentType), pageId);
+                pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName, contentType));
+                wikiData[0] = getThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail, contentType), pageId);
                 // Log.d("profileUrl", profileUrl);
+                wikiData[1] = getArtistExtract(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName + wikiAPIExtractUrl, contentType));
+                wikiData[1] = wikiData[1].substring(0, wikiData[1].indexOf("\n") + 1);
+                Log.e("wikiData[1]", wikiAPITitlesUrl + wikiArtistName + wikiAPIExtractUrl);
+                Log.e("wikiData[1]", wikiData[1]);
+                addWikiElements(wikiData);
 
-                Log.e("wikiData[0]", wikiData[0]);
-                setUpProfile(wikiData);
             }
         };
         wikiThread.start();
@@ -540,7 +496,7 @@ public class linkbeat extends Activity {
         return pageIds;
     }
 
-    private String getWikiThumbUrl(String wikiResponse, String pageId) {
+    private String getThumbUrl(String wikiResponse, String pageId) {
         String sourceString = "";
         try {
             JSONObject wr = new JSONObject(wikiResponse);
@@ -561,18 +517,19 @@ public class linkbeat extends Activity {
 
     private String getArtistExtract(String wikiResponse) {
         String artistExtract = "";
+        try {
+            JSONObject wr = new JSONObject(wikiResponse);
+            JSONObject wikiJSONObj = wr.getJSONObject("query");
+            String pages = wikiJSONObj.getString("pages");
+            JSONObject pageIdValue = new JSONObject(pages);
+            JSONObject pageIds = pageIdValue.getJSONObject(pageId);
+            artistExtract = pageIds.getString("extract");
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return artistExtract;
     }
-
-//    private String getThreadString() {
-//        Log.d("getThreadString", "s" + _THREADSTRING + "e");
-//        return _THREADSTRING;
-//    }
-//
-//    private void setThreadString(String newString) {
-//        _THREADSTRING = newString;
-//    }
 
     @Override
     protected void onDestroy() {
