@@ -12,6 +12,7 @@ import java.net.URL;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 import android.app.Activity;
@@ -51,6 +52,8 @@ import android.widget.Toast;
 import com.acrcloud.rec.sdk.ACRCloudClient;
 import com.acrcloud.rec.sdk.ACRCloudConfig;
 import com.acrcloud.rec.sdk.IACRCloudListener;
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,18 +68,22 @@ public class ProfileGenerator extends Activity {
     private String pageId;
     private String[] artistInfo;
     Display display;
+    isVerified is;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        Log.d("FacebookSdk", String.valueOf(FacebookSdk.isInitialized()));
         Log.d("PROFILEGENERATRED", "STARTED");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout);
         Bundle b = getIntent().getExtras();
         artistInfo = b.getStringArray("artistInfo");
+        is = new isVerified();
+        is.ArtistVerifiedJsonResponse(artistInfo[1]);
         display = getWindowManager().getDefaultDisplay();
         buildProfile();
     }
-
 
     //REAL ONE - NOW CHANGING "artists" to test other artist pages
     //"{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
@@ -95,95 +102,12 @@ public class ProfileGenerator extends Activity {
     }
 
 
-    //
     public void buildProfile() {
         TextView textView = (TextView) findViewById(R.id.artistTitle);
         textView.setText(artistInfo[0]);
         retrieveWikiData(artistInfo[0]);
         getBandsInTown(artistInfo[1]);
-
-
-        // COMMENTED OUT ACRCLOUD REQUESTS TO SAVE USING ALL THE REQUESTS......use _ACRRESPONSE constant for testing purposes
-//
-//        String accessKey = "83cdb4671a18926e305e55430a0a3564";
-//        String accessSecret = "OPqSf8SuBSsypqg4Pu7eFJF0KrfyjRa04nAIqNsW";
-//        Map<String, String> postParams = new HashMap<>();
-//        postParams.put("host", "ap-southeast-1.api.acrcloud.com");
-//        postParams.put("access_key", accessKey);
-//        postParams.put("access_secret", accessSecret);
-//        postParams.put("debug", "false");
-//        postParams.put("timeout", "10");
-//
-//        final ACRCloudClient cc = new ACRCloudClient();
-//
-//        ACRCloudConfig config = new ACRCloudConfig();
-//        config.accessKey = accessKey;
-//        config.accessSecret = accessSecret;
-//        config.context = getApplicationContext();
-//        config.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
-//        config.requestTimeout = 5000;
-//        config.host = "ap-southeast-1.api.acrcloud.com";
-//        config.acrcloudListener = new IACRCloudListener() {
-//            @Override
-//            public void onResult(String s) {
-//                Toast.makeText(getBaseContext(), "Result", Toast.LENGTH_SHORT).show();
-//                Log.d("RESULT", s);
-//                cc.release();
-//                String[] artistInfo = parseACRCloudResponseOfArtistString(s);
-//                TextView textView = (TextView) findViewById(R.id.artistTitle);
-//                textView.setText(artistInfo[0]);
-//                retrieveWikiData(artistInfo[0]);
-//                getBandsInTown(artistInfo[1]);
-//
-//            }
-//
-//            @Override
-//            public void onVolumeChanged(double v) {
-//
-//            }
-//        };
-//        cc.initWithConfig(config);
-//        cc.startRecognize();
-
-
     }
-
-
-    //[0] - unformatted artist name E.g AC/DC
-    //[1] - fortmatted artist name E.g ACDC
-    private String[] parseACRCloudResponseOfArtistString(String ARCCloudJSON) {
-        String[] artistArr = new String[2];
-        String artist = "";
-        try {
-            JSONObject artistParent = new JSONObject(ARCCloudJSON);
-            try {
-                JSONObject obj = artistParent.getJSONObject("metadata");
-                Object art = obj.getString("music");
-
-                JSONArray music = new JSONArray(art.toString());
-                JSONObject a = music.getJSONObject(0);
-                Object objArt = a.getString("artists");
-
-                JSONArray artistJSONArray = new JSONArray(objArt.toString());
-                JSONObject artistNameObj = artistJSONArray.getJSONObject(0);
-                Object artistName = artistNameObj.getString("name");
-                artist = artistName.toString();
-
-            } catch (ClassCastException e) {
-                e.printStackTrace();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        artistArr[0] = artist;
-
-        artist = artist.replaceAll("\\s", "%20");
-        artist = artist.replaceAll("/", "");
-
-        artistArr[1] = artist;
-        return artistArr;
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -270,7 +194,7 @@ public class ProfileGenerator extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ScrollView  scrollView= (ScrollView) findViewById(R.id.tableScrollView);
+                ScrollView scrollView = (ScrollView) findViewById(R.id.tableScrollView);
                 Point res = new Point();
                 display.getSize(res);
                 scrollView.getLayoutParams().height = res.y / 4;
@@ -321,7 +245,7 @@ public class ProfileGenerator extends Activity {
     public int getTourDatesCount(String response) {
         int tourDateCount = 0;
         try {
-            Log.e("getTourDatesResponse", response);
+            Log.e("getTourDatesResponse", ":" + response);
             if (response.equals("[]")) {
                 return 0;
             }
@@ -381,6 +305,8 @@ public class ProfileGenerator extends Activity {
                             public void run() {
                                 Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
                                 artistLogo.setImageBitmap(Bitmap.createScaledBitmap(b, bitmapWidth, bitmapHeight, false));
+                                TextView extractView = (TextView) findViewById(R.id.extractView);
+                                extractView.setText(wikiInfo[1]);
                             }
                         });
                     } catch (IOException e) {
@@ -389,8 +315,7 @@ public class ProfileGenerator extends Activity {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
-                TextView extractView = (TextView) findViewById(R.id.extractView);
-                extractView.setText(wikiInfo[1]);
+
             }
         };
         setupThread.start();

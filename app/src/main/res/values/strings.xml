@@ -2,5 +2,7 @@
     <string name="app_name">Linkbeat</string>
     <string name="action_settings">Settings</string>
     <string name="bio">BIO</string>
-    M<string name="tour_dates">TOUR DATES</string>
+    <string name="tour_dates">TOUR DATES</string>
+    <string name="facebook_app_id">1033456563340806</string>
+
 </resources>
