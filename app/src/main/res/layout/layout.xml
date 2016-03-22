@@ -23,7 +23,6 @@
         android:paddingEnd="5dp"
         android:paddingLeft="50dp"
         android:paddingRight="5dp"
-        android:paddingStart="50dp"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -31,17 +30,17 @@
         android:id="@+id/bioText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="210dp"
-        android:text="@string/bio"
-        android:layout_marginLeft="5dp"/>
+        android:text="@string/bio" />
 
     <ScrollView
         android:id="@+id/extractScrollView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/artistTitle"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/artistTitle"
         android:layout_marginTop="102dp">
 
         <TextView
@@ -50,17 +49,18 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/artistTitle"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="98dp"
             android:layout_marginLeft="5dp"
+            android:layout_marginTop="98dp"
             android:text="" />
     </ScrollView>
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/tableScrollView"
-        android:text="@string/tour_dates"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+        android:text="@string/tour_dates" />
 
     <ScrollView
         android:id="@+id/tableScrollView"
@@ -75,6 +75,14 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:background="@color/lightBlue"/>
+            android:background="@color/lightBlue" />
     </ScrollView>
+
+    <ImageView
+        android:id="@+id/facebookIcon"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/artistTitle"
+        android:layout_toEndOf="@+id/artistLogo"
+        android:layout_toRightOf="@+id/artistLogo" />
 </RelativeLayout>

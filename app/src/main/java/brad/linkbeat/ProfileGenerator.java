@@ -10,10 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 
 import android.app.Activity;
 
@@ -24,57 +20,48 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 
+
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.ContactsContract;
+
 import android.util.Base64;
 
 import android.os.Bundle;
 import android.view.Display;
-import android.view.ViewGroup;
+
 import android.util.Log;
-import android.view.Display;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.graphics.Bitmap;
-import android.widget.Toast;
-
-
-import com.acrcloud.rec.sdk.ACRCloudClient;
-import com.acrcloud.rec.sdk.ACRCloudConfig;
-import com.acrcloud.rec.sdk.IACRCloudListener;
-import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 
 public class ProfileGenerator extends Activity {
     final private String _GET = "GET";
     final String contentType = "application/x-www-form-urlenoded";
     Bitmap tourDateIcon;
-    private String pageId;
+    private String wikiPageId;
     private String[] artistInfo;
     Display display;
     isVerified is;
+    static String facebookPageId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(getApplicationContext());
-        Log.d("FacebookSdk", String.valueOf(FacebookSdk.isInitialized()));
-        Log.d("PROFILEGENERATRED", "STARTED");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout);
         Bundle b = getIntent().getExtras();
@@ -83,11 +70,9 @@ public class ProfileGenerator extends Activity {
         is.ArtistVerifiedJsonResponse(artistInfo[1]);
         display = getWindowManager().getDefaultDisplay();
         buildProfile();
-    }
+        setFacebookIntent();
 
-    //REAL ONE - NOW CHANGING "artists" to test other artist pages
-    //"{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"QMUY41500080\",\"upc\":\"653738300326\"},\"album\":{\"name\":\"Lean On (Remixes), Vol.2\"},\"play_offset_ms\":14080,\"duration_ms\":\"225000\",\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"deezer\":{\"album\":{\"id\":11145928},\"artists\":[{\"id\":282118}],\"track\":{\"id\":\"106904402\"}}},\"acrid\":\"7dd84cfe6c7a4822abbebc18c480b5cb\",\"title\":\"Lean On (feat. MØ & DJ Snake) [J Balvin & Farruko Remix]\",\"artists\":[{\"name\":\"Major Lazer\"}]},{\"external_ids\":{\"isrc\":\"QMUY41500008\",\"upc\":\"653738275129\"},\"play_offset_ms\":14280,\"external_metadata\":{\"omusic\":{\"album\":{\"name\":\"Peace Is The Mission 和平任務\",\"id\":1231350},\"artists\":[{\"name\":\"Major Lazer\",\"id\":27252}],\"track\":{\"name\":\"Lean On (feat. MØ &amp; DJ Snake)\",\"id\":1231350004}},\"spotify\":{\"album\":{\"id\":\"56k0jdcAe2CBpCOsD1HE0A\"},\"artists\":[{\"id\":\"738wLrAtLtCtFOLvQBXOXp\"},{\"id\":\"0bdfiayQAKewqEvaU6rXCv\"},{\"id\":\"540vIaP2JwjQb9dm3aArA4\"}],\"track\":{\"id\":\"4KcVVhAaHxqtX2ANt4b3tc\"}},\"itunes\":{\"album\":{\"id\":975442615},\"artists\":[{\"id\":315761934}],\"track\":{\"id\":975443020}},\"deezer\":{\"album\":{\"id\":9751262},\"artists\":[{\"id\":7595506}],\"genres\":[{\"id\":106}],\"track\":{\"id\":95859598}}},\"label\":\"Mad Decent\",\"release_date\":\"2015-03-02\",\"title\":\"Lean On\",\"duration_ms\":\"176561\",\"album\":{\"name\":\"Lean On\"},\"acrid\":\"ded792bc75a2c6758edf9d2503327792\",\"genres\":[{\"name\":\"Electro\"}],\"artists\":[{\"name\":\"Major Lazer feat. MØ & DJ Snake\"}]}],\"timestamp_utc\":\"2015-12-14 15:17:37\"},\"result_type\":0}\n" +
-    //    "12-14 15:17:37.188   ";
+    }
 
     //From Stackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
 
@@ -102,11 +87,20 @@ public class ProfileGenerator extends Activity {
     }
 
 
+    public static void setfacebookPageId(String pageId){
+        facebookPageId = pageId;
+        Log.d("SET facebookPageId", facebookPageId);
+    }
+
+
+
     public void buildProfile() {
         TextView textView = (TextView) findViewById(R.id.artistTitle);
         textView.setText(artistInfo[0]);
         retrieveWikiData(artistInfo[0]);
         getBandsInTown(artistInfo[1]);
+        setBitmap((ImageView) findViewById(R.id.facebookIcon), "http://i.imgur.com/fOdp1EF.png");
+
     }
 
     @Override
@@ -163,19 +157,54 @@ public class ProfileGenerator extends Activity {
     }
 
 
-    public void setBitmapForTourDates() {
+    public void setBitmap(ImageView im, final String imageUrl) {
+        final ImageView imageView = im;
+        final String url = imageUrl;
         Thread getBuyImageThread = new Thread() {
             @Override
             public void run() {
                 try {
-                    URL imageUrl = new URL("http://i.imgur.com/ATl96GN.png");
+                    URL imageUrl = new URL(url);
                     try {
                         InputStream is = imageUrl.openConnection().getInputStream();
                         final Bitmap bitMap = BitmapFactory.decodeStream(is);
                         String encodedImage = encodeTobase64(bitMap);
                         final byte[] imageAsBytes = Base64.decode(encodedImage, 0);
-                        Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+                        final Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                imageView.setImageBitmap(b);
+                            }
+                        });
+
+                    } catch (IOException e) {
+                        Log.d("HTTP: ", e.toString());
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        };
+        getBuyImageThread.start();
+    }
+
+    public void setBitmapForTourDates(final String imageUrl) {
+        final String url = imageUrl;
+        Thread getBuyImageThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL imageUrl = new URL(url);
+                    try {
+                        InputStream is = imageUrl.openConnection().getInputStream();
+                        final Bitmap bitMap = BitmapFactory.decodeStream(is);
+                        String encodedImage = encodeTobase64(bitMap);
+                        final byte[] imageAsBytes = Base64.decode(encodedImage, 0);
+                        final Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
                         tourDateIcon = b;
+
                     } catch (IOException e) {
                         Log.d("HTTP: ", e.toString());
                     }
@@ -190,7 +219,7 @@ public class ProfileGenerator extends Activity {
 
 
     public void makeTourDatesTable(final String response, final int tourDateCount, final Context context) {
-        setBitmapForTourDates();
+        setBitmapForTourDates("http://i.imgur.com/ATl96GN.png");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -388,8 +417,8 @@ public class ProfileGenerator extends Activity {
             @Override
             public void run() {
 
-                pageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName, contentType));
-                wikiData[0] = getThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + pageId + wikiAPIImagesUrlTail, contentType), pageId);
+                wikiPageId = parsePageIds(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName, contentType));
+                wikiData[0] = getThumbUrl(httpReq(_GET, wikiAPIImagesUrlHead + wikiPageId + wikiAPIImagesUrlTail, contentType), wikiPageId);
                 // Log.d("profileUrl", profileUrl);
                 wikiData[1] = getArtistExtract(httpReq(_GET, wikiAPITitlesUrl + wikiArtistName + wikiAPIExtractUrl, contentType));
                 wikiData[1] = wikiData[1].substring(0, wikiData[1].indexOf("\n") + 1);
@@ -447,13 +476,30 @@ public class ProfileGenerator extends Activity {
             JSONObject wikiJSONObj = wr.getJSONObject("query");
             String pages = wikiJSONObj.getString("pages");
             JSONObject pageIdValue = new JSONObject(pages);
-            JSONObject pageIds = pageIdValue.getJSONObject(pageId);
+            JSONObject pageIds = pageIdValue.getJSONObject(wikiPageId);
             artistExtract = pageIds.getString("extract");
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return artistExtract;
+    }
+
+
+    private void setFacebookIntent() {
+        ImageView facebookIcon = (ImageView) findViewById(R.id.facebookIcon);
+        facebookIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String fbUrl = "fb://page/"+ facebookPageId;
+                Log.d("app url", fbUrl);
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(fbUrl));
+
+                startActivity(i);
+
+            }
+        });
     }
 
     @Override
