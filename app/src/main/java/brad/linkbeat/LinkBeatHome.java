@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,11 +19,18 @@ import org.json.JSONObject;
  */
 public class LinkBeatHome extends Activity{
 
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "Zoaz3XFzgpWL3ooxM9LBXMSv8";
+    private static final String TWITTER_SECRET = "4lwqC6ZlWK9x7kDcPq1dRWoM8YRIWx9vlbAkfyA8AYcpcMDAIQ ";
+
+
     private String _ACRRESPONSE = "{\"status\":{\"msg\":\"Success\",\"code\":0,\"version\":\"1.0\"},\"service_type\":0,\"metadata\":{\"music\":[{\"external_ids\":{\"isrc\":\"GBK3W1000207\",\"upc\":\"602537671243\"},\"play_offset_ms\":3300,\"external_metadata\":{\"spotify\":{\"album\":{\"id\":\"0mkOUedmYlOzCC4tOm2v0c\"},\"artists\":[{\"id\":\"3mIj9lX2MWuHmhNCA7LSCW\"}],\"track\":{\"id\":\"5Y1X9CVW6JRWqFm1cCzvwp\"}},\"deezer\":{\"album\":{\"id\":7633582},\"artists\":[{\"id\":3583591}],\"genres\":[{\"id\":85}],\"track\":{\"id\":76908423}}},\"label\":\"Interscope\",\"release_date\":\"2014-04-15\",\"title\":\"Chocolate\",\"duration_ms\":\"315357\",\"album\":{\"name\":\"The 1975\"},\"acrid\":\"6e758b01a0885a19c4db5919d7452ec4\",\"genres\":[{\"name\":\"Alternative\"}],\"artists\":[{\"name\":\"The 1975\"}]}],\"timestamp_utc\":\"2016-02-24 22:09:06\"},\"result_type\":0}";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.home);
     }
 

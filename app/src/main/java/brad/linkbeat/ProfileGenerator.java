@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
+import java.util.Map;
 
 import android.app.Activity;
 
@@ -48,7 +49,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 public class ProfileGenerator extends Activity {
     final private String _GET = "GET";
     final String contentType = "application/x-www-form-urlenoded";
@@ -58,6 +58,7 @@ public class ProfileGenerator extends Activity {
     Display display;
     isVerified is;
     static String facebookPageId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,8 @@ public class ProfileGenerator extends Activity {
         display = getWindowManager().getDefaultDisplay();
         buildProfile();
         setFacebookIntent();
+
+
 
     }
 
