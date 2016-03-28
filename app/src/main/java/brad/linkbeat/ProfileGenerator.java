@@ -10,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
-import java.util.Map;
 
 import android.app.Activity;
 
@@ -43,6 +42,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.graphics.Bitmap;
+
 import com.facebook.FacebookSdk;
 
 import org.json.JSONArray;
@@ -58,6 +58,7 @@ public class ProfileGenerator extends Activity {
     Display display;
     isVerified is;
     static String facebookPageId;
+    String formattedArtistInfo;
 
 
     @Override
@@ -69,12 +70,12 @@ public class ProfileGenerator extends Activity {
         artistInfo = b.getStringArray("artistInfo");
         is = new isVerified();
         is.ArtistVerifiedJsonResponse(artistInfo[1]);
+        formattedArtistInfo = artistInfo[1].replace("%20", "");
         display = getWindowManager().getDefaultDisplay();
         buildProfile();
         setFacebookIntent();
-
-
-
+        setTwitterIntent();
+        setInstagramIntent();
     }
 
     //From Stackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
@@ -90,11 +91,10 @@ public class ProfileGenerator extends Activity {
     }
 
 
-    public static void setfacebookPageId(String pageId){
+    public static void setfacebookPageId(String pageId) {
         facebookPageId = pageId;
         Log.d("SET facebookPageId", facebookPageId);
     }
-
 
 
     public void buildProfile() {
@@ -102,7 +102,9 @@ public class ProfileGenerator extends Activity {
         textView.setText(artistInfo[0]);
         retrieveWikiData(artistInfo[0]);
         getBandsInTown(artistInfo[1]);
-        setBitmap((ImageView) findViewById(R.id.facebookIcon), "http://i.imgur.com/fOdp1EF.png");
+        setBitmap((ImageView) findViewById(R.id.facebookIcon), "http://i.imgur.com/JldIk2d.png");
+        setBitmap((ImageView) findViewById(R.id.twitterIcon), "http://i.imgur.com/H6C4c16.jpg");
+        setBitmap((ImageView) findViewById(R.id.instagramIcon), "http://i.imgur.com/lj2CPt0.png");
 
     }
 
@@ -494,15 +496,84 @@ public class ProfileGenerator extends Activity {
         facebookIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String fbUrl = "fb://page/"+ facebookPageId;
-                Log.d("app url", fbUrl);
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(fbUrl));
-
-                startActivity(i);
-
+                startActivity(getFacebookIntent());
             }
         });
+
+    }
+
+    private Intent getFacebookIntent() {
+        Intent i;
+        try {
+            final String fbUrl = "fb://page/" + facebookPageId;
+            Log.d("app url", fbUrl);
+            i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(fbUrl));
+        } catch (Exception e) {
+            final String fbUrl = "http://www.facebook.com/" + facebookPageId;
+            Log.d("app url", fbUrl);
+            i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(fbUrl));
+        }
+        return i;
+    }
+
+    private void setTwitterIntent() {
+        ImageView twitterIcon = (ImageView) findViewById(R.id.twitterIcon);
+        twitterIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(getTwitterIntent());
+            }
+        });
+
+    }
+
+    private Intent getTwitterIntent() {
+        Intent i;
+
+        try {
+            final String twUrl = "twitter://user?screen_name=" + formattedArtistInfo;
+            Log.d("app url", twUrl);
+            i = new Intent(Intent.ACTION_VIEW);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setData(Uri.parse(twUrl));
+        } catch (Exception e) {
+            final String fbUrl = "http://www.twitter.com/" + formattedArtistInfo;
+            Log.d("app url", fbUrl);
+            i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(fbUrl));
+        }
+        return i;
+    }
+
+    private void setInstagramIntent() {
+        ImageView instagramIcon = (ImageView) findViewById(R.id.instagramIcon);
+        instagramIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(getInstagramIntent());
+            }
+        });
+
+    }
+
+    private Intent getInstagramIntent() {
+        Intent i;
+        try {
+            final String twUrl = "http://instagram.com/_u/" + formattedArtistInfo;
+            Log.d("app url", twUrl);
+            i = new Intent(Intent.ACTION_VIEW);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setData(Uri.parse(twUrl));
+        } catch (Exception e) {
+            final String twUrl = "http://www.instagram.com" + formattedArtistInfo;
+            Log.d("app url", twUrl);
+            i = new Intent(Intent.ACTION_VIEW);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setData(Uri.parse(twUrl));
+        }
+        return i;
     }
 
     @Override

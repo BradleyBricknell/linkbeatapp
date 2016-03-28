@@ -80,9 +80,23 @@
 
     <ImageView
         android:id="@+id/facebookIcon"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_below="@+id/artistTitle"
         android:layout_toEndOf="@+id/artistLogo"
         android:layout_toRightOf="@+id/artistLogo" />
+
+    <ImageView
+        android:id="@+id/twitterIcon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/artistTitle"
+        android:layout_toRightOf="@+id/facebookIcon" />
+
+    <ImageView
+        android:id="@+id/instagramIcon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/artistTitle"
+        android:layout_toRightOf="@+id/twitterIcon" />
 </RelativeLayout>
