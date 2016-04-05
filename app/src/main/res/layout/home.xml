@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/lightBlue">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightBlue"
+    android:id="@+id/homeRelativeLayout">
 
     <Button
-        android:text="ACRCloud"
         android:id="@+id/clicky"
-        android:layout_height="100dp"
         android:layout_width="100dp"
-        android:width="300dp"
-        android:onClick="start"
-        android:height="300dp"
-        android:gravity="center"
+        android:layout_height="100dp"
         android:layout_below="@+id/artistTitle"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="115dp" />
+        android:layout_marginTop="115dp"
+        android:width="300dp"
+        android:height="300dp"
+        android:gravity="center"
+        android:onClick="start"
+        android:text="@string/home_button_text" />
 
 </RelativeLayout>

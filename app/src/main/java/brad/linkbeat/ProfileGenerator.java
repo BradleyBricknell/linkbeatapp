@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.InputStream;
 
+
 import android.app.Activity;
 
 import android.content.Context;
@@ -23,6 +24,7 @@ import android.graphics.Point;
 
 import android.net.Uri;
 
+import android.os.Handler;
 import android.util.Base64;
 
 import android.os.Bundle;
@@ -34,9 +36,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -57,25 +64,24 @@ public class ProfileGenerator extends Activity {
     private String[] artistInfo;
     Display display;
     isVerified is;
-    static String facebookPageId;
+    static String facebookPageId = "";
     String formattedArtistInfo;
-
+    static Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.layout);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        is = new isVerified();
+        super.onCreate(savedInstanceState);
         Bundle b = getIntent().getExtras();
         artistInfo = b.getStringArray("artistInfo");
-        is = new isVerified();
         is.ArtistVerifiedJsonResponse(artistInfo[1]);
+        TextView statusText = (TextView) findViewById(R.id.generatingProfileText);
+        statusText.setText(R.string.generating_profile_text);
         formattedArtistInfo = artistInfo[1].replace("%20", "");
         display = getWindowManager().getDefaultDisplay();
         buildProfile();
-        setFacebookIntent();
-        setTwitterIntent();
-        setInstagramIntent();
     }
 
     //From Stackoverflow for encoding and decoding bitmaps for easy bitmap manipuaton
@@ -86,27 +92,44 @@ public class ProfileGenerator extends Activity {
         immagex.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] b = baos.toByteArray();
         String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
         return imageEncoded;
     }
 
 
     public static void setfacebookPageId(String pageId) {
         facebookPageId = pageId;
-        Log.d("SET facebookPageId", facebookPageId);
+        Log.d("facebookPageId SET TO", facebookPageId);
+
     }
 
-
     public void buildProfile() {
+        setBitmap((ImageView) findViewById(R.id.facebookIcon), "http://i.imgur.com/JldIk2d.png");
+        setBitmap((ImageView) findViewById(R.id.twitterIcon), "http://i.imgur.com/H6C4c16.jpg");
+        setBitmap((ImageView) findViewById(R.id.instagramIcon), "http://i.imgur.com/lj2CPt0.png");
+        setBitmap((ImageView) findViewById(R.id.restartAppButton), "http://i.imgur.com/IyWGob7.png");
+        setTwitterIntent();
+        setInstagramIntent();
         TextView textView = (TextView) findViewById(R.id.artistTitle);
         textView.setText(artistInfo[0]);
         retrieveWikiData(artistInfo[0]);
         getBandsInTown(artistInfo[1]);
-        setBitmap((ImageView) findViewById(R.id.facebookIcon), "http://i.imgur.com/JldIk2d.png");
-        setBitmap((ImageView) findViewById(R.id.twitterIcon), "http://i.imgur.com/H6C4c16.jpg");
-        setBitmap((ImageView) findViewById(R.id.instagramIcon), "http://i.imgur.com/lj2CPt0.png");
-
+        handler.postDelayed(fbRunnable, 2000);
+        handler.postDelayed(csRunnable, 5000);
     }
+
+    Runnable csRunnable = new Runnable() {
+        @Override
+        public void run() {
+            findViewById(R.id.loadingProfileLayout).setVisibility(View.GONE);
+        }
+    };
+
+    Runnable fbRunnable = new Runnable() {
+        @Override
+        public void run() {
+            setFacebookIntent();
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -195,6 +218,7 @@ public class ProfileGenerator extends Activity {
         getBuyImageThread.start();
     }
 
+
     public void setBitmapForTourDates(final String imageUrl) {
         final String url = imageUrl;
         Thread getBuyImageThread = new Thread() {
@@ -241,7 +265,8 @@ public class ProfileGenerator extends Activity {
                 if (tourDateCount == 0) {
                     row = new TableRow(context);
                     TextView noEventMessage = new TextView(context);
-                    noEventMessage.setText("Sorry! Not Currently Touring!");
+                    noEventMessage.setText(R.string.not_touring_text);
+                    noEventMessage.setTextColor(Color.BLACK);
                     row.addView(noEventMessage);
                     tl.addView(row);
                 } else {
@@ -312,7 +337,6 @@ public class ProfileGenerator extends Activity {
                 Log.d("ticketStatus", extractEventsTicketStatus(response, 0));
 
             }
-
         };
         bandsInTownThread.start();
     }
@@ -353,6 +377,8 @@ public class ProfileGenerator extends Activity {
             }
         };
         setupThread.start();
+
+        handler.postDelayed(csRunnable, 5000);
     }
 
     private String extractEventDateTime(String response, int index) {
@@ -434,9 +460,6 @@ public class ProfileGenerator extends Activity {
             }
         };
         wikiThread.start();
-
-
-        /// /return profileUrl;
     }
 
 
@@ -492,14 +515,18 @@ public class ProfileGenerator extends Activity {
 
 
     private void setFacebookIntent() {
-        ImageView facebookIcon = (ImageView) findViewById(R.id.facebookIcon);
-        facebookIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(getFacebookIntent());
-            }
-        });
-
+        Log.d("facebookPageId", facebookPageId + ";");
+        if (facebookPageId.equals("")) {
+            noSocialMediaPresence();
+        } else {
+            ImageView facebookIcon = (ImageView) findViewById(R.id.facebookIcon);
+            facebookIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(getFacebookIntent());
+                }
+            });
+        }
     }
 
     private Intent getFacebookIntent() {
@@ -574,6 +601,20 @@ public class ProfileGenerator extends Activity {
             i.setData(Uri.parse(twUrl));
         }
         return i;
+    }
+
+    private void noSocialMediaPresence() {
+        findViewById(R.id.facebookIcon).setVisibility(View.GONE);
+        findViewById(R.id.twitterIcon).setVisibility(View.GONE);
+        findViewById(R.id.instagramIcon).setVisibility(View.GONE);
+        findViewById(R.id.noSocialPresenceText).setVisibility(View.VISIBLE);
+    }
+
+    public void restartApp(View v) {
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage(getBaseContext().getPackageName());
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
     @Override

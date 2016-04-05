@@ -4,5 +4,10 @@
     <string name="bio">BIO</string>
     <string name="tour_dates">TOUR DATES</string>
     <string name="facebook_app_id">1033456563340806</string>
-
+    <string name="generating_profile_text">Generating Artist Profile!</string>
+    <string name="listening">Listening...</string>
+    <string name="home_button_text">Tap to listen</string>
+    <string name="no_social_presence">Sorry, No social media presence found!</string>
+    <string name="not_touring_text">Sorry! Not Currently Touring!</string>
+    <string name="unableToIdentify">Unable to Identify Artist, please try again</string>
 </resources>

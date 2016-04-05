@@ -1,102 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/profileFrameLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relativeLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/lightBlue">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/profile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/lightBlue">
 
-    <ImageView
-        android:id="@+id/artistLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
-
-    <TextView
-        android:id="@+id/artistTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/artistLogo"
-        android:layout_toRightOf="@+id/artistLogo"
-        android:paddingEnd="5dp"
-        android:paddingLeft="50dp"
-        android:paddingRight="5dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/bioText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="210dp"
-        android:text="@string/bio" />
-
-    <ScrollView
-        android:id="@+id/extractScrollView"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/artistTitle"
-        android:layout_marginTop="102dp">
-
-        <TextView
-            android:id="@+id/extractView"
+        <ImageView
+            android:id="@+id/artistLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/artistTitle"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="98dp"
-            android:text="" />
-    </ScrollView>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tableScrollView"
-        android:layout_marginLeft="5dp"
-        android:text="@string/tour_dates" />
-
-    <ScrollView
-        android:id="@+id/tableScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-        <TableLayout
-            android:id="@+id/tourDatesTable"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:background="@color/lightBlue" />
-    </ScrollView>
+            android:layout_alignParentTop="true" />
 
-    <ImageView
-        android:id="@+id/facebookIcon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/artistTitle"
-        android:layout_toEndOf="@+id/artistLogo"
-        android:layout_toRightOf="@+id/artistLogo" />
+        <TextView
+            android:id="@+id/artistTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/artistLogo"
+            android:layout_toRightOf="@+id/artistLogo"
+            android:paddingEnd="5dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="5dp"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <ImageView
-        android:id="@+id/twitterIcon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/artistTitle"
-        android:layout_toRightOf="@+id/facebookIcon" />
+        <TextView
+            android:id="@+id/bioText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="210dp"
+            android:text="@string/bio" />
 
-    <ImageView
-        android:id="@+id/instagramIcon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/artistTitle"
-        android:layout_toRightOf="@+id/twitterIcon" />
-</RelativeLayout>
+        <ScrollView
+            android:id="@+id/extractScrollView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/artistTitle"
+            android:layout_marginTop="102dp">
+
+            <TextView
+                android:id="@+id/extractView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/artistTitle"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="98dp"
+                android:text="" />
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/tourDatesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/tableScrollView"
+            android:layout_marginLeft="5dp"
+            android:text="@string/tour_dates" />
+
+        <ScrollView
+            android:id="@+id/tableScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <TableLayout
+                android:id="@+id/tourDatesTable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@color/lightBlue" />
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/noSocialPresenceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_social_presence"
+            android:layout_below="@+id/artistTitle"
+            android:layout_toEndOf="@+id/artistLogo"
+            android:layout_toRightOf="@+id/artistLogo"
+            android:layout_marginRight="54dp"
+            android:layout_marginEnd="54dp"
+            android:visibility="invisible"/>
+
+        <ImageView
+            android:id="@+id/facebookIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/artistTitle"
+            android:layout_toEndOf="@+id/artistLogo"
+            android:layout_toRightOf="@+id/artistLogo" />
+
+        <ImageView
+            android:id="@+id/twitterIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/artistTitle"
+            android:layout_toRightOf="@+id/facebookIcon" />
+
+        <ImageView
+            android:id="@+id/instagramIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/artistTitle"
+            android:layout_toRightOf="@+id/twitterIcon" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/restartAppButton"
+            android:onClick="restartApp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/loadingProfileLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <View
+            android:id="@+id/backgroundView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black" />
+
+
+        <pl.droidsonroids.gif.GifTextView
+            android:id="@+id/loadingGif"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="120dp"
+            android:layout_marginRight="120dp"
+            android:layout_marginTop="200dp"
+            android:layout_marginBottom="200dp"
+            android:src="@drawable/loadinganimation"
+            android:background="@drawable/loadinganimation" />
+
+
+
+        <TextView
+            android:id="@+id/generatingProfileText"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/listening"
+            android:textColor="#FFFFFF" />
+    </RelativeLayout>
+
+
+</FrameLayout>
