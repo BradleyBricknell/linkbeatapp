@@ -10,4 +10,5 @@
     <string name="no_social_presence">Sorry, No social media presence found!</string>
     <string name="not_touring_text">Sorry! Not Currently Touring!</string>
     <string name="unableToIdentify">Unable to Identify Artist, please try again</string>
+    <string name="bad_response">Bad Response</string>
 </resources>

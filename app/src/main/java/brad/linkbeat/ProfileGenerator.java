@@ -71,11 +71,12 @@ public class ProfileGenerator extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.layout);
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        establishFacebookSDK();
         is = new isVerified();
         super.onCreate(savedInstanceState);
         Bundle b = getIntent().getExtras();
         artistInfo = b.getStringArray("artistInfo");
+
         is.ArtistVerifiedJsonResponse(artistInfo[1]);
         TextView statusText = (TextView) findViewById(R.id.generatingProfileText);
         statusText.setText(R.string.generating_profile_text);
@@ -95,6 +96,10 @@ public class ProfileGenerator extends Activity {
         return imageEncoded;
     }
 
+
+    public void establishFacebookSDK() {
+        FacebookSdk.sdkInitialize(getApplicationContext());
+    }
 
     public static void setfacebookPageId(String pageId) {
         facebookPageId = pageId;
@@ -434,7 +439,7 @@ public class ProfileGenerator extends Activity {
     // [0] wiki thumburl
     // [1] wiki extract
 
-    private void retrieveWikiData(final String artistName) {
+    public String[] retrieveWikiData(final String artistName) {
         final String wikiArtistName = artistName.replace(" ", "_");
         final String[] wikiData = new String[2];
 
@@ -460,6 +465,7 @@ public class ProfileGenerator extends Activity {
             }
         };
         wikiThread.start();
+        return wikiData;
     }
 
 
@@ -529,7 +535,7 @@ public class ProfileGenerator extends Activity {
         }
     }
 
-    private Intent getFacebookIntent() {
+    public Intent getFacebookIntent() {
         Intent i;
         try {
             final String fbUrl = "fb://page/" + facebookPageId;
@@ -556,7 +562,7 @@ public class ProfileGenerator extends Activity {
 
     }
 
-    private Intent getTwitterIntent() {
+    public Intent getTwitterIntent() {
         Intent i;
 
         try {
@@ -585,7 +591,7 @@ public class ProfileGenerator extends Activity {
 
     }
 
-    private Intent getInstagramIntent() {
+    public Intent getInstagramIntent() {
         Intent i;
         try {
             final String twUrl = "http://instagram.com/_u/" + formattedArtistInfo;

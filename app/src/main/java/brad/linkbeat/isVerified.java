@@ -16,8 +16,9 @@ import org.json.JSONObject;
  * Created by Brad on 27/02/2016.
  */
 public class isVerified extends Activity {
-
+     String pageId;
     public void ArtistVerifiedJsonResponse(String artist) {
+
         final AccessToken token = new AccessToken("1033456563340806|dBiRL2nxNZeYalf0LPOmDDzmnl0", "1033456563340806", "852507748103932", null, null, null, null, null);
         final String artistName = artist.replace("%20", "");
         final Bundle bundleWithParams = new Bundle();
@@ -32,20 +33,33 @@ public class isVerified extends Activity {
 
                     public void onCompleted(GraphResponse response) {
                         try {
+                            Log.e("ss", "ON COMPLETE");
                             if (!response.toString().contains("Cannot query users by their username")) {
                                 ProfileGenerator.setfacebookPageId(response.getJSONObject().getString("id"));
+                                ApplicationTest.setFacebookPageId(response.getJSONObject().getString("id"));
+                                setId(response.getJSONObject().getString("id"));
+
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 }
 
         );
         graphRequest.executeAsync();
+
     }
 
+    private void setId(String id){
+        pageId = id;
+    }
+
+    public String getId(){
+        return pageId;
+
+    }
 
 
 }
